@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import environ
+import django_on_heroku
 
 env = environ.Env(
     # set casting, default value
@@ -52,6 +53,8 @@ INSTALLED_APPS = [
     #third party apps
     'django_extensions',
     'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
     'djoser'
 ]
 
@@ -90,10 +93,7 @@ WSGI_APPLICATION = 'games.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db()
 }
 
 
@@ -141,10 +141,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly'
+        'rest_framework.permissions.IsAuthenticated'
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),
+}
+
+django_on_heroku.settings(locals())
+del DATABASES['default']['OPTIONS']['sslmode']
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+DJOSER = {
+    'USER_CREATE_PASSWORD_RETYPE': True,
 }
