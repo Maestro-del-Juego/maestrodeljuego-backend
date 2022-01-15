@@ -28,3 +28,73 @@ Note: Django has a handy tool to generate a secret key. Before running the follo
 ```
 * Run `python manage.py createsuperuser` to create an admin account.
 * Run `python manage.py runserver` to start the server locally.
+
+# Endpoints
+
+If you are running the server locally, the base URL will be displayed in the terminal as an IP address.
+Unless otherwise indicated, the request body should be empty.
+Token authentication should be indicated in the request head, with the prefix 'Token'.
+
+## User Registration
+
+Username, password, and retyped password required.
+
+### Request
+```json
+POST /auth/users/
+{
+    "username": "definitelynotyourDM",
+    "password": "iamaGOD!",
+    "re_password": "iamaGOD!"
+}
+```
+
+### Response
+```json
+201 Created
+{
+    "email": "",
+    "username": "definitelynotyourDM",
+    "id": 234
+}
+```
+
+
+## User Login
+
+Username and password required.
+
+### Request
+```json
+POST /auth/token/login/
+{
+    "username": "definitelynotyourDM",
+    "password": "iamaGOD!"
+}
+```
+
+### Response
+
+```json
+200 OK
+{
+    "auth_token": "<your token has here>"
+}
+```
+
+
+## User Logout
+
+Token authentication required.
+
+### Request
+
+```json
+POST /auth/token/logout/
+```
+
+### Response
+
+```json
+204 No Content
+```
