@@ -1,7 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
-class User(models.Model):
+class CustomUser(AbstractUser):
+    avatar = models.URLField(null=True, blank=True)
+
     def __repr__(self):
         return f"<User username:{self.username}>"
     
@@ -11,7 +14,7 @@ class User(models.Model):
 
 class Game(models.Model):
     title = models.CharField(max_length=250)
-    bgg_id = models.IntegerField()
+    bgg = models.IntegerField()
     pub_year = models.IntegerField()
     description = models.TextField(null=True, blank=True)
     min_players = models.IntegerField(null=True, blank=True)
@@ -19,8 +22,9 @@ class Game(models.Model):
     image = models.URLField(null=True, blank=True)
     playtime = models.IntegerField(null=True, blank=True)
     player_age = models.IntegerField(null=True, blank=True)
-    owners = models.ManyToManyField('User', related_name='games', blank=True)
-    wishlisted = models.ManyToManyField('User', related_name='wishlist', blank=True)
+    weight = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
+    owners = models.ManyToManyField('CustomUser', related_name='games', blank=True)
+    wishlisted = models.ManyToManyField('CustomUser', related_name='wishlist', blank=True)
     tags = models.ManyToManyField('Tag', related_name='games', blank=True)
 
     def __repr__(self):
@@ -33,7 +37,7 @@ class Game(models.Model):
 class GameNight(models.Model):
     date = models.DateField()
     game = models.ForeignKey('Game', on_delete=models.CASCADE, related_name='gamenights')
-    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='gamenights')
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='gamenights')
     player_num = models.IntegerField()
     round_num = models.IntegerField()
     playtime = models.IntegerField(blank=True)
