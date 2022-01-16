@@ -1,6 +1,7 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from .models import Game
-from .serializers import GameListSerializer, GameDetailSerializer
+from .serializers import GameListSerializer, GameDetailSerializer, WishListSerializer
 import requests, json, xmltodict, decimal
 
 
@@ -78,3 +79,19 @@ def create_game_obj(game_dict):
     )
 
     return game_obj
+
+
+
+
+
+
+
+class WishListView(ListAPIView):
+    serializer_class = WishListSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = user.wishlist.all()
+        return queryset
+        
+
