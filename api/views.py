@@ -86,12 +86,22 @@ def create_game_obj(game_dict):
 
 
 
+<<<<<<< HEAD
 class WishListView(ListAPIView):
     serializer_class = WishListSerializer
+=======
+
+class WishListView(ListAPIView):
+    serializer_class = GameListSerializer
+>>>>>>> c61238194368fa2fb70dc66b9e6e37325b266d33
 
     def get_queryset(self):
         user = self.request.user
         queryset = user.wishlist.all()
+<<<<<<< HEAD
         return queryset
         
 
+=======
+        return queryset
+>>>>>>> c61238194368fa2fb70dc66b9e6e37325b266d33

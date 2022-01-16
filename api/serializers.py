@@ -41,6 +41,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
         )
 
 
+<<<<<<< HEAD
 class WishListSerializer(serializers.ModelSerializer):
 
     class Meta:   
@@ -53,3 +54,5 @@ class WishListSerializer(serializers.ModelSerializer):
             'image',
         )
 
+=======
+>>>>>>> c61238194368fa2fb70dc66b9e6e37325b266d33

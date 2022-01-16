@@ -25,5 +25,9 @@ urlpatterns = [
     path('library/', views.LibraryView.as_view(), name='user-library'),
     path('games/<int:bgg>/', views.GameDetailView.as_view(), name='game-detail'),
     path('wishlist/', views.WishListView.as_view(), name="user_wishlist"),
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> c61238194368fa2fb70dc66b9e6e37325b266d33
 ]
