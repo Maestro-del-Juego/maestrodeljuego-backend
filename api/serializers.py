@@ -25,6 +25,8 @@ class UserNestedSerializer(serializers.ModelSerializer):
 
 
 class GameDetailSerializer(serializers.ModelSerializer):
+    owned = serializers.SerializerMethodField()
+    wishlisted = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
@@ -38,4 +40,20 @@ class GameDetailSerializer(serializers.ModelSerializer):
             'image',
             'playtime',
             'player_age',
+            'owned',
+            'wishlisted'
         )
+
+    def get_owned(self, obj):
+        user = self.context['request'].user
+        owners = obj.owners.all()
+        if user in owners:
+            return True
+        return False
+
+    def get_wishlisted(self, obj):
+        user = self.context['request'].user
+        wishers = obj.wishlisted.all()
+        if user in wishers:
+            return True
+        return False
