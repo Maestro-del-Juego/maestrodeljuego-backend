@@ -39,3 +39,17 @@ class GameDetailSerializer(serializers.ModelSerializer):
             'playtime',
             'player_age',
         )
+
+
+class WishListSerializer(serializers.ModelSerializer):
+
+    class Meta:   
+        model = Game
+        fields = (
+            'pk',
+            'bgg',
+            'title',
+            'pub_year',
+            'image',
+        )
+

@@ -23,5 +23,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
     path('api-auth/', include('rest_framework.urls')),
     path('library/', views.LibraryView.as_view(), name='user-library'),
-    path('games/<int:bgg>/', views.GameDetailView.as_view(), name='game-detail')
+    path('games/<int:bgg>/', views.GameDetailView.as_view(), name='game-detail'),
+    path('wishlist/', views.WishListView.as_view(), name="user_wishlist"),
+
 ]
