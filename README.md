@@ -98,3 +98,23 @@ POST /auth/token/logout/
 ```json
 204 No Content
 ```
+
+
+## Game Detail
+
+The integer in the URL should correspond to the game's BGG ID.
+
+### Request
+
+```json
+GET /games/1406/
+```
+
+### Response
+
+```json
+200 OK
+{
+
+}
+```
