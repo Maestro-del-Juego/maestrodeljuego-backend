@@ -1,4 +1,3 @@
-from msilib.schema import ServiceInstall
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from .models import Game
 from .serializers import GameListSerializer, GameDetailSerializer
@@ -50,10 +49,18 @@ class GameDetailView(RetrieveUpdateAPIView):
         kwargs.setdefault('context', self.get_serializer_context())
         data = self.request.data
         if 'owned' in data:
-            game = self.get_object()
-            data_copy = data.copy()
-            user = self.request.user
-            
+            kwargs['data'] = {}
+        return serializer_class(*args, **kwargs)
+
+    def perform_update(self, serializer):
+        game = self.get_object()
+        user = self.request.user
+        data = self.request.data
+        if 'owned' in data:
+            game.update_owners(user)
+        elif 'wishlisted' in data:
+            game.update_wishlisted(user)
+        game.save()
 
 
 def new_game(bgg):
@@ -90,12 +97,6 @@ def create_game_obj(game_dict):
     )
 
     return game_obj
-
-
-
-
-
-
 
 
 class WishListView(ListAPIView):
