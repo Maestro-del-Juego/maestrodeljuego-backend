@@ -1,3 +1,4 @@
+from msilib.schema import ServiceInstall
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from .models import Game
 from .serializers import GameListSerializer, GameDetailSerializer
@@ -37,11 +38,22 @@ class GameDetailView(RetrieveUpdateAPIView):
 
         filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
 
+        # This is the only line changed from the original method
         obj = self.get_game(queryset, **filter_kwargs)
 
         self.check_object_permissions(self.request, obj)
 
         return obj
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        data = self.request.data
+        if 'owned' in data:
+            game = self.get_object()
+            data_copy = data.copy()
+            user = self.request.user
+            
 
 
 def new_game(bgg):
