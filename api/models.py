@@ -33,6 +33,13 @@ class Game(models.Model):
     def __str__(self):
         return f"{self.title}"
 
+    def update_owners(self, user):
+        owner_list = self.owners
+        if user in owner_list:
+            owner_list.remove(user)
+        else:
+            owner_list.add(user)
+
 
 class GameNight(models.Model):
     date = models.DateField()
