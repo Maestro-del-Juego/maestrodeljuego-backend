@@ -34,6 +34,10 @@ class Game(models.Model):
         return f"{self.title}"
 
     def update_owners(self, user):
+        '''
+        Adds or removes user from the owners M2M field.
+        '''
+
         owner_list = self.owners
         if user in owner_list.all():
             owner_list.remove(user)
@@ -42,6 +46,10 @@ class Game(models.Model):
             self.wishlisted.remove(user)
 
     def update_wishlisted(self, user):
+        '''
+        Adds or removes user from the wishlisted M2M field.
+        '''
+
         wishlist_users = self.wishlisted
         if user in wishlist_users.all():
             wishlist_users.remove(user)
