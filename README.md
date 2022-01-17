@@ -163,3 +163,32 @@ PATCH /games/1406/
 	"wishlisted": false
 }
 ```
+
+
+## Game Wishlist
+
+### Request
+
+```json
+GET /wishlist/
+```
+
+### Response
+
+```json
+[
+    {
+        "title": "Monopoly",
+        "bgg": 1406,
+        "pub_year": 1933,
+        "description": null,
+        "min_players": 2,
+        "max_players": 8,
+        "image": "https://cf.geekdo-images.com/9nGoBZ0MRbi6rdH47sj2Qg__original/img/bA8irydTCNlE38QSzM9EhcUIuNU=/0x0/filters:format(jpeg)/pic5786795.jpg",
+        "playtime": 180,
+        "player_age": 8,
+        "owned": false,
+        "wishlisted": true
+    },
+    (...)
+]
