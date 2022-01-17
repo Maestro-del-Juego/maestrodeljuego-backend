@@ -37,11 +37,30 @@ class GameDetailView(RetrieveUpdateAPIView):
 
         filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
 
+        # This is the only line changed from the original method
         obj = self.get_game(queryset, **filter_kwargs)
 
         self.check_object_permissions(self.request, obj)
 
         return obj
+
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        data = self.request.data
+        if 'owned' in data:
+            kwargs['data'] = {}
+        return serializer_class(*args, **kwargs)
+
+    def perform_update(self, serializer):
+        game = self.get_object()
+        user = self.request.user
+        data = self.request.data
+        if 'owned' in data:
+            game.update_owners(user)
+        elif 'wishlisted' in data:
+            game.update_wishlisted(user)
+        game.save()
 
 
 def new_game(bgg):
@@ -78,12 +97,6 @@ def create_game_obj(game_dict):
     )
 
     return game_obj
-
-
-
-
-
-
 
 
 class WishListView(ListAPIView):
