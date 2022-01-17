@@ -39,6 +39,7 @@ class Game(models.Model):
             owner_list.remove(user)
         else:
             owner_list.add(user)
+            self.wishlisted.remove(user)
 
     def update_wishlisted(self, user):
         wishlist_users = self.wishlisted
@@ -46,6 +47,7 @@ class Game(models.Model):
             wishlist_users.remove(user)
         else:
             wishlist_users.add(user)
+            self.owners.remove(user)
 
 
 class GameNight(models.Model):
