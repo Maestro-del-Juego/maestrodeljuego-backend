@@ -1,4 +1,5 @@
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from .models import Game
 from .serializers import GameListSerializer, GameDetailSerializer
 import requests, json, xmltodict, decimal
@@ -6,9 +7,11 @@ import requests, json, xmltodict, decimal
 
 class LibraryView(ListAPIView):
     serializer_class = GameListSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Game.objects.filter(user_id=self.request.user.pk)
+        user = self.request.user
+        queryset = user.games.all()
         return queryset
 
 
