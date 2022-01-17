@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, CustomUser
+from .models import Game, CustomUser, GameNight
 
 
 class GameListSerializer(serializers.ModelSerializer):
@@ -69,4 +69,18 @@ class WishListSerializer(serializers.ModelSerializer):
             'title',
             'pub_year',
             'image',
+        )
+
+
+class GameNightSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GameNight
+        fields = (
+            'date',
+            'game',
+            'user',
+            'player_num',
+            'round_num',
+            'playtime',
         )
