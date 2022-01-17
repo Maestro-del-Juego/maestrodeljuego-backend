@@ -98,3 +98,97 @@ POST /auth/token/logout/
 ```json
 204 No Content
 ```
+
+
+## Game Detail
+
+The integer in the URL should correspond to the game's BGG ID.
+
+### Request
+
+```json
+GET /games/1406/
+```
+
+### Response
+
+```json
+200 OK
+{
+	"title": "Monopoly",
+	"bgg": 1406,
+	"pub_year": 1933,
+	"description": null,
+	"min_players": 2,
+	"max_players": 8,
+	"image": "https://cf.geekdo-images.com/9nGoBZ0MRbi6rdH47sj2Qg__original/img/bA8irydTCNlE38QSzM9EhcUIuNU=/0x0/filters:format(jpeg)/pic5786795.jpg",
+	"playtime": 180,
+	"player_age": 8,
+	"owned": false,
+	"wishlisted": false
+}
+```
+
+
+## Updating Game
+
+The integer in the URL should correspond to the game's BGG ID. The only fields that can be updated are "owned" and "wishlisted", which should have empty arrays as their value. Token authentication is required.
+
+### Request
+
+Note: This example assumes that the "owned" field has a value of False.
+
+```json
+PATCH /games/1406/
+{
+    "owned": []
+}
+```
+
+### Response
+
+```json
+200 OK
+{
+	"title": "Monopoly",
+	"bgg": 1406,
+	"pub_year": 1933,
+	"description": null,
+	"min_players": 2,
+	"max_players": 8,
+	"image": "https://cf.geekdo-images.com/9nGoBZ0MRbi6rdH47sj2Qg__original/img/bA8irydTCNlE38QSzM9EhcUIuNU=/0x0/filters:format(jpeg)/pic5786795.jpg",
+	"playtime": 180,
+	"player_age": 8,
+	"owned": true,
+	"wishlisted": false
+}
+```
+
+
+## Game Wishlist
+
+### Request
+
+```json
+GET /wishlist/
+```
+
+### Response
+
+```json
+[
+    {
+        "title": "Monopoly",
+        "bgg": 1406,
+        "pub_year": 1933,
+        "description": null,
+        "min_players": 2,
+        "max_players": 8,
+        "image": "https://cf.geekdo-images.com/9nGoBZ0MRbi6rdH47sj2Qg__original/img/bA8irydTCNlE38QSzM9EhcUIuNU=/0x0/filters:format(jpeg)/pic5786795.jpg",
+        "playtime": 180,
+        "player_age": 8,
+        "owned": false,
+        "wishlisted": true
+    },
+    (...)
+]
