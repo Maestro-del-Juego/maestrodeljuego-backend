@@ -133,4 +133,7 @@ class GameNightView(ListCreateAPIView):
         queryset = GameNight.objects.filter(user_id=user.id)
         return queryset
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 

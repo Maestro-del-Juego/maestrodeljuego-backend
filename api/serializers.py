@@ -73,7 +73,7 @@ class WishListSerializer(serializers.ModelSerializer):
 
 
 class GameNightSerializer(serializers.ModelSerializer):
-
+    user = serializers.SlugRelatedField(read_only=True, slug_field="id")
     class Meta:
         model = GameNight
         fields = (
