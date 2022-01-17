@@ -89,6 +89,9 @@ def get_primary_name(names_list):
     Returns the English name of the specified board game
     '''
 
+    if type(names_list) == type({}):
+        return names_list['@value']
+
     for name in names_list:
         if name['@type'] == 'primary':
             return name['@value']
