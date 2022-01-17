@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from .models import Game
 from .serializers import GameListSerializer, GameDetailSerializer, WishListSerializer
 import requests, json, xmltodict, decimal
@@ -7,9 +8,11 @@ import requests, json, xmltodict, decimal
 
 class LibraryView(ListAPIView):
     serializer_class = GameListSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Game.objects.filter(user_id=self.request.user.pk)
+        user = self.request.user
+        queryset = user.games.all()
         return queryset
 
 
@@ -65,6 +68,10 @@ class GameDetailView(RetrieveUpdateAPIView):
 
 
 def new_game(bgg):
+    '''
+    Takes a BGG ID and returns the associated game object.
+    '''
+
     url = f"https://www.boardgamegeek.com/xmlapi2/thing?id={bgg}&stats=1"
     response = requests.get(url)
     ordered_dict = xmltodict.parse(response.text)
@@ -78,11 +85,19 @@ def new_game(bgg):
     return game_obj
 
 def get_primary_name(names_list):
+    '''
+    Returns the English name of the specified board game
+    '''
+
     for name in names_list:
         if name['@type'] == 'primary':
             return name['@value']
 
 def create_game_obj(game_dict):
+    '''
+    Creates an instance of the Game class using data from the given dictionary.
+    '''
+
     names = game_dict['name']
 
     game_obj = Game(
