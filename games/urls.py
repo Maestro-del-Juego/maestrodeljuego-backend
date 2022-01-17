@@ -25,4 +25,5 @@ urlpatterns = [
     path('library/', views.LibraryView.as_view(), name='user-library'),
     path('games/<int:bgg>/', views.GameDetailView.as_view(), name='game-detail'),
     path('wishlist/', views.WishListView.as_view(), name="user_wishlist"),
+    path('gamenight/', views.GameNightView.as_view(), name="game_night"),
 ]

@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Game
-from .serializers import GameListSerializer, GameDetailSerializer, WishListSerializer
+from .models import Game, GameNight
+from .serializers import GameListSerializer, GameDetailSerializer, GameNightSerializer
 import requests, json, xmltodict, decimal
 
 
@@ -122,3 +122,18 @@ class WishListView(ListAPIView):
         user = self.request.user
         queryset = user.wishlist.all()
         return queryset
+
+
+class GameNightView(ListCreateAPIView):
+    serializer_class = GameNightSerializer
+    # permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = GameNight.objects.filter(user_id=user.id)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
