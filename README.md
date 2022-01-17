@@ -100,7 +100,7 @@ POST /auth/token/logout/
 ```
 
 
-## Set User's Username
+## Set User's New Username
 
 Token authentication required.
 
@@ -110,6 +110,29 @@ Token authentication required.
 POST /auth/users/set_username/
 {
     "new_username": "older_pip",
+    "re_new_username": "older_pip",
+    "current_password": "Estella123"
+}
+```
+
+### Response
+
+```json
+204 No Content
+```
+
+
+## Set User's New Password
+
+Token authentication required.
+
+### Request
+
+```json
+POST /auth/users/set_password/
+{
+    "new_password": "iowetheconvict",
+    "re_new_password": "iowetheconvict",
     "current_password": "Estella123"
 }
 ```
