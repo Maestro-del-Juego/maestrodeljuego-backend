@@ -100,6 +100,27 @@ POST /auth/token/logout/
 ```
 
 
+## Set User's Username
+
+Token authentication required.
+
+### Request
+
+```json
+POST /auth/users/set_username/
+{
+    "new_username": "older_pip",
+    "current_password": "Estella123"
+}
+```
+
+### Response
+
+```json
+204 No Content
+```
+
+
 ## Game Detail
 
 The integer in the URL should correspond to the game's BGG ID.
