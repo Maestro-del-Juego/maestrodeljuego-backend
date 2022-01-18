@@ -71,3 +71,20 @@ class GameNightSerializer(serializers.ModelSerializer):
             'round_num',
             'playtime',
         )
+
+
+class DjoserUserSerializer(serializers.ModelSerializer):
+    games = GameListSerializer(many=True, read_only=True)
+    wishlist = GameListSerializer(many=True, read_only=True)
+    gamenights = GameNightSerializer(many=True, read_only=True)
+    class Meta:
+        model = CustomUser
+        fields = (
+            'pk',
+            'username',
+            'email',
+            'avatar',
+            'library',
+            'wishlist',
+            'gamenights',
+        )
