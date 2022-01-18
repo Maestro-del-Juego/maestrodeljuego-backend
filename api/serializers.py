@@ -84,7 +84,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'username',
             'email',
             'avatar',
-            'library',
+            'games',
             'wishlist',
             'gamenights',
         )
