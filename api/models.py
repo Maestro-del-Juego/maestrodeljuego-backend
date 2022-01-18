@@ -26,6 +26,7 @@ class Game(models.Model):
     owners = models.ManyToManyField('CustomUser', related_name='games', blank=True)
     wishlisted = models.ManyToManyField('CustomUser', related_name='wishlist', blank=True)
     tags = models.ManyToManyField('Tag', related_name='games', blank=True)
+    categories = models.ManyToManyField('Category', related_name='games', blank=True)
 
     def __repr__(self):
         return f"<Game title:{self.title}>"
