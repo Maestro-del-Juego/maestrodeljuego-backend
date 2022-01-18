@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 class CustomUser(AbstractUser):
-    avatar = models.URLField(null=True, blank=True)
+    avatar = models.URLField(blank=True, default='')
 
     def __repr__(self):
         return f"<User username:{self.username}>"
@@ -75,6 +75,7 @@ class GameNight(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=150)
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='tags', null=True)
 
     def __repr__(self):
         return f"<Tag name:{self.name}>"

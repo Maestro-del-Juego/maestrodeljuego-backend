@@ -1,5 +1,6 @@
+from ctypes.wintypes import tagSIZE
 from rest_framework import serializers
-from .models import Game, CustomUser, GameNight
+from .models import Game, CustomUser, GameNight, Tag
 
 
 class GameListSerializer(serializers.ModelSerializer):
@@ -87,4 +88,12 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'games',
             'wishlist',
             'gamenights',
+        )
+
+class TagListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = (
+            'name',
+            'user',
         )
