@@ -159,6 +159,10 @@ DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,
     'SET_PASSWORD_RETYPE': True,
     'SET_USERNAME_RETYPE': True,
+    'SERIALIZERS': {
+        'user': 'api.serializers.DjoserUserSerializer',
+        'current_user': 'api.serializers.DjoserUserSerializer'
+    }
 }
 
 AUTH_USER_MODEL = 'api.CustomUser'
