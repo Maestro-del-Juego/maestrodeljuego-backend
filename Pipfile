@@ -15,6 +15,7 @@ gunicorn = "*"
 django-cors-headers = "*"
 bpython = "*"
 xmltodict = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 
