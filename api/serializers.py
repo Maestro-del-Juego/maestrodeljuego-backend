@@ -59,19 +59,6 @@ class GameDetailSerializer(serializers.ModelSerializer):
         return False
 
 
-class WishListSerializer(serializers.ModelSerializer):
-
-    class Meta:   
-        model = Game
-        fields = (
-            'pk',
-            'bgg',
-            'title',
-            'pub_year',
-            'image',
-        )
-
-
 class GameNightSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(read_only=True, slug_field="id")
     class Meta:
