@@ -1,6 +1,7 @@
 from ctypes.wintypes import tagSIZE
 from rest_framework import serializers
 from .models import Game, CustomUser, GameNight, Tag
+from djoser.serializers import UserCreatePasswordRetypeSerializer
 
 
 class GameListSerializer(serializers.ModelSerializer):
@@ -88,6 +89,16 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'games',
             'wishlist',
             'gamenights',
+        )
+
+
+class DjoserRegistrationSerializer(UserCreatePasswordRetypeSerializer):
+    class Meta(UserCreatePasswordRetypeSerializer.Meta):
+        fields = (
+            'username',
+            'avatar',
+            'email',
+            'password',
         )
 
 class TagListSerializer(serializers.ModelSerializer):
