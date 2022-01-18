@@ -82,3 +82,12 @@ class Tag(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+class Category(models.Model):
+    name = models.CharField(max_length=150)
+
+    def __repr__(self):
+        return f"<Category name: {self.name}>"
+
+    def __str__(self):
+        return f"{self.name}"
