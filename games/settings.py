@@ -161,7 +161,8 @@ DJOSER = {
     'SET_USERNAME_RETYPE': True,
     'SERIALIZERS': {
         'user': 'api.serializers.DjoserUserSerializer',
-        'current_user': 'api.serializers.DjoserUserSerializer'
+        'current_user': 'api.serializers.DjoserUserSerializer',
+        'user_create_password_retype': 'api.serializers.DjoserUserSerializer'
     }
 }
 

@@ -44,6 +44,7 @@ Username, password, and retyped password required.
 POST /auth/users/
 {
     "username": "definitelynotyourDM",
+    "avatar": "https://tv-fanatic-res.cloudinary.com/iu/s--AKrsWpSo--/t_full/cs_srgb,f_auto,fl_strip_profile.lossy,q_auto:420/v1590268660/abed-the-dm-community-s2e14.jpg",
     "password": "iamaGOD!",
     "re_password": "iamaGOD!"
 }
