@@ -59,19 +59,6 @@ class GameDetailSerializer(serializers.ModelSerializer):
         return False
 
 
-class WishListSerializer(serializers.ModelSerializer):
-
-    class Meta:   
-        model = Game
-        fields = (
-            'pk',
-            'bgg',
-            'title',
-            'pub_year',
-            'image',
-        )
-
-
 class GameNightSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(read_only=True, slug_field="id")
     class Meta:
@@ -83,4 +70,21 @@ class GameNightSerializer(serializers.ModelSerializer):
             'player_num',
             'round_num',
             'playtime',
+        )
+
+
+class DjoserUserSerializer(serializers.ModelSerializer):
+    games = GameListSerializer(many=True, read_only=True)
+    wishlist = GameListSerializer(many=True, read_only=True)
+    gamenights = GameNightSerializer(many=True, read_only=True)
+    class Meta:
+        model = CustomUser
+        fields = (
+            'pk',
+            'username',
+            'email',
+            'avatar',
+            'games',
+            'wishlist',
+            'gamenights',
         )

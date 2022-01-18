@@ -100,6 +100,78 @@ POST /auth/token/logout/
 ```
 
 
+## Set User's New Username
+
+Token authentication required.
+
+### Request
+
+```json
+POST /auth/users/set_username/
+{
+    "new_username": "older_pip",
+    "re_new_username": "older_pip",
+    "current_password": "Estella123"
+}
+```
+
+### Response
+
+```json
+204 No Content
+```
+
+
+## Set User's New Password
+
+Token authentication required.
+
+### Request
+
+```json
+POST /auth/users/set_password/
+{
+    "new_password": "iowetheconvict",
+    "re_new_password": "iowetheconvict",
+    "current_password": "Estella123"
+}
+```
+
+### Response
+
+```json
+204 No Content
+```
+
+
+## Updating User Email or Avatar URL
+
+Token authentication required. Request body should include the fields you want to change: "email", "avatar", or both.
+### Request
+
+```json
+PATCH /auth/users/me/
+{
+    "avatar": "https://s3-us-west-2.amazonaws.com/flx-editorial-wordpress/wp-content/uploads/2020/04/06125710/Goofy_Movie_Anniversary6.jpg"
+}
+```
+
+### Response
+
+```json
+200 OK
+{
+	"pk": 2,
+	"username": "cool_max",
+	"email": "",
+	"avatar": "https://s3-us-west-2.amazonaws.com/flx-editorial-wordpress/wp-content/uploads/2020/04/06125710/Goofy_Movie_Anniversary6.jpg",
+	"games": [],
+	"wishlist": [],
+	"gamenights": []
+}
+```
+
+
 ## Game Detail
 
 The integer in the URL should correspond to the game's BGG ID.
