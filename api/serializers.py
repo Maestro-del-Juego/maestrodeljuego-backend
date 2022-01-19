@@ -148,3 +148,61 @@ class TagListSerializer(serializers.ModelSerializer):
             'name',
             'user',
         )
+
+
+class GameForGNDetailSerializer(serializers.ModelSerializer):
+    votes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Game
+        fields = (
+            'pk',
+            'bgg',
+            'title',
+            'pub_year',
+            'image',
+            'votes',
+        )
+
+    def get_votes(self):
+        return 0
+
+
+class GameNightDetailSerializer(serializers.ModelSerializer):
+    user = UserNestedSerializer()
+    invitees = ContactNestedSerializer(many=True)
+    games = GameListSerializer(many=True)
+    option1 = GameForGNDetailSerializer(read_only=True)
+    option2 = GameForGNDetailSerializer(read_only=True)
+    option3 = GameForGNDetailSerializer(read_only=True)
+    option4 = GameForGNDetailSerializer(read_only=True)
+    option5 = GameForGNDetailSerializer(read_only=True)
+    option6 = GameForGNDetailSerializer(read_only=True)
+    option7 = GameForGNDetailSerializer(read_only=True)
+    option8 = GameForGNDetailSerializer(read_only=True)
+    option9 = GameForGNDetailSerializer(read_only=True)
+    option10 = GameForGNDetailSerializer(read_only=True)
+
+    class Meta:
+        model = GameNight
+        fields = (
+            'pk',
+            'user',
+            'date',
+            'invitees',
+            'attendees',
+            'games',
+            'start_time',
+            'end_time',
+            'location',
+            'option1',
+            'option2',
+            'option3',
+            'option4',
+            'option5',
+            'option6',
+            'option7',
+            'option8',
+            'option9',
+            'option10',
+        )

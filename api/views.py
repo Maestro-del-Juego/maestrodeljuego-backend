@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Game, GameNight, Tag, Category
 from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer
 import requests, json, xmltodict, decimal
+from datetime import date
 
 
 class LibraryView(ListAPIView):
@@ -169,3 +170,19 @@ class TagListView(ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class GameNightDetailView(RetrieveUpdateAPIView):
+    serializer_class = GameNightSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = user.gamenights.all()
+        return queryset
+
+    def get_object(self):
+        GN_date = date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
+        queryset = self.filter_queryset(self.get_queryset())
+        obj = get_object_or_404(queryset, date=GN_date)
+        self.check_object_permissions(self.request, obj)
+        return obj

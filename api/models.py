@@ -138,9 +138,8 @@ class Contact(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
-        
-        
-        
+
+
 class Voting(models.Model):
     gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='voting')
     contact = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='voting')
