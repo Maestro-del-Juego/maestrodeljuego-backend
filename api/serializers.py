@@ -64,10 +64,10 @@ class GameDetailSerializer(serializers.ModelSerializer):
 
 
 class GameNightSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(read_only=True, slug_field="id")
-    invitees = serializers.SlugRelatedField(read_only=True, many=True, slug_field="contact_id")
-    attendees = serializers.SlugRelatedField(read_only=True, many=True, slug_field="contact_id")
-    games = serializers.SlugRelatedField(read_only=True, many=True, slug_field="game_id")
+    user = UserNestedSerializer(read_only=True)
+    invitees = serializers.StringRelatedField(read_only=True, many=True)
+    attendees = serializers.StringRelatedField(read_only=True, many=True)
+    games = serializers.SlugRelatedField(read_only=True, many=True, slug_field="title")
     option1 = GameListSerializer(many=True, read_only=True)
     option2 = GameListSerializer(many=True, read_only=True)
     option3 = GameListSerializer(many=True, read_only=True)
