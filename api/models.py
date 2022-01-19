@@ -128,12 +128,13 @@ class Feedback(models.Model):
 
 
 class Contact(models.Model):
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='contacts', null=True)
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     email = models.EmailField(max_length=254)
     
     def __repr__(self):
-        return f"<Contact name:{self.first_name} {self.last_name}>"
+        return f"<Contact {self.first_name} {self.last_name}>"
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
