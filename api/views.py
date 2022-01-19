@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Game, GameNight, Tag
+from .models import Game, GameNight, Tag, Category
 from .serializers import GameListSerializer, GameDetailSerializer, GameNightSerializer, TagListSerializer
 import requests, json, xmltodict, decimal
 
@@ -73,16 +73,19 @@ def new_game(bgg):
     '''
 
     url = f"https://www.boardgamegeek.com/xmlapi2/thing?id={bgg}&stats=1"
+
+    game_dict = xml_to_dict(url)
+
+    game_obj = create_game_obj(game_dict)
+
+    return game_obj
+
+def xml_to_dict(url):
     response = requests.get(url)
     ordered_dict = xmltodict.parse(response.text)
     game_dict_nest = json.loads(json.dumps(ordered_dict))
     game_dict = game_dict_nest['items']['item']
-
-    game_obj = create_game_obj(game_dict)
-
-    game_obj.save()
-
-    return game_obj
+    return game_dict
 
 def get_primary_name(names_list):
     '''
@@ -102,6 +105,7 @@ def create_game_obj(game_dict):
     '''
 
     names = game_dict['name']
+    link_dict = game_dict['link']
 
     game_obj = Game(
         title=get_primary_name(names),
@@ -115,7 +119,22 @@ def create_game_obj(game_dict):
         weight=decimal.Decimal(game_dict['statistics']['ratings']['averageweight']['@value'])
     )
 
+    game_obj.save()
+
+    game_obj.categories.set(get_categories(link_dict))
+
     return game_obj
+
+def get_categories(link_dict):
+    categories = []
+
+    for item in link_dict:
+        if item['@type'] == 'boardgamecategory':
+            name = item['@value']
+            category = Category.objects.get(name=name)
+            categories.append(category)
+
+    return categories
 
 
 class WishListView(ListAPIView):
