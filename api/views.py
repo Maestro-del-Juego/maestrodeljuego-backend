@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Game, GameNight, Tag, Category
-from .serializers import GameListSerializer, GameDetailSerializer, GameNightSerializer, TagListSerializer
+from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer
 import requests, json, xmltodict, decimal
 
 

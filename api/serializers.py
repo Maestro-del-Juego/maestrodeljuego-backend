@@ -1,6 +1,5 @@
-from ctypes.wintypes import tagSIZE
 from rest_framework import serializers
-from .models import Game, CustomUser, GameNight, Tag
+from .models import Game, CustomUser, Tag, GameNight
 from djoser.serializers import UserCreatePasswordRetypeSerializer
 
 
