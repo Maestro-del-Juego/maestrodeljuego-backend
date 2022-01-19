@@ -62,17 +62,44 @@ class GameDetailSerializer(serializers.ModelSerializer):
         return False
 
 
+
 class GameNightSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(read_only=True, slug_field="id")
+    user = UserNestedSerializer(read_only=True)
+    invitees = serializers.StringRelatedField(read_only=True, many=True)
+    attendees = serializers.StringRelatedField(read_only=True, many=True)
+    games = serializers.SlugRelatedField(read_only=True, many=True, slug_field="title")
+    option1 = GameListSerializer(many=True, read_only=True)
+    option2 = GameListSerializer(many=True, read_only=True)
+    option3 = GameListSerializer(many=True, read_only=True)
+    option4 = GameListSerializer(many=True, read_only=True)
+    option5 = GameListSerializer(many=True, read_only=True)
+    option6 = GameListSerializer(many=True, read_only=True)
+    option7 = GameListSerializer(many=True, read_only=True)
+    option8 = GameListSerializer(many=True, read_only=True)
+    option9 = GameListSerializer(many=True, read_only=True)
+    option10 = GameListSerializer(many=True, read_only=True)
     class Meta:
         model = GameNight
         fields = (
-            'date',
-            'game',
             'user',
+            'date',
+            'invitees',
+            'attendees',
+            'games',
             'player_num',
-            'round_num',
-            'playtime',
+            'start_time',
+            'end_time',
+            'location',
+            'option1',
+            'option2',
+            'option3',
+            'option4',
+            'option5',
+            'option6',
+            'option7',
+            'option8',
+            'option9',
+            'option10'
         )
 
 
