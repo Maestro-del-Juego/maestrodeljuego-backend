@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, CustomUser, Tag, GameNight
+from .models import Game, CustomUser, Tag, GameNight, Contact
 from djoser.serializers import UserCreatePasswordRetypeSerializer
 
 
@@ -109,3 +109,33 @@ class TagListSerializer(serializers.ModelSerializer):
             'name',
             'user',
         )
+
+
+class GameNightDetailSerializer(serializers.ModelSerializer):
+    user = UserNestedSerializer()
+    # invitees = ContactNestedSerializer(many=True)
+
+    class Meta:
+        model = GameNight
+        fields = (
+            'pk',
+            'user',
+            'date',
+            'invitees',
+            'attendees',
+            'games',
+            'start_time',
+            'end_time',
+            'location',
+            'option1',
+            'option2',
+            'option3',
+            'option4',
+            'option5',
+            'option6',
+            'option7',
+            'option8',
+            'option9',
+            'option10',
+        )
+
