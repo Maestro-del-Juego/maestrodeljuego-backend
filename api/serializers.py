@@ -150,9 +150,27 @@ class TagListSerializer(serializers.ModelSerializer):
         )
 
 
+class GameForGNDetailSerializer(serializers.ModelSerializer):
+    votes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Game
+        fields = (
+            'pk',
+            'bgg',
+            'title',
+            'pub_year',
+            'image',
+            'votes',
+        )
+
+    def get_votes(self):
+        return 0
+
+
 class GameNightDetailSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer()
-    # invitees = ContactNestedSerializer(many=True)
+    invitees = ContactNestedSerializer(many=True)
 
     class Meta:
         model = GameNight
@@ -177,4 +195,3 @@ class GameNightDetailSerializer(serializers.ModelSerializer):
             'option9',
             'option10',
         )
-
