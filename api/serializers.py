@@ -29,6 +29,7 @@ class UserNestedSerializer(serializers.ModelSerializer):
 class GameDetailSerializer(serializers.ModelSerializer):
     owned = serializers.SerializerMethodField()
     wishlisted = serializers.SerializerMethodField()
+    categories = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Game
@@ -42,6 +43,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
             'image',
             'playtime',
             'player_age',
+            'categories',
             'owned',
             'wishlisted'
         )

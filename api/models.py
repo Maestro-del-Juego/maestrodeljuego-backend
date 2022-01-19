@@ -26,6 +26,7 @@ class Game(models.Model):
     owners = models.ManyToManyField('CustomUser', related_name='games', blank=True)
     wishlisted = models.ManyToManyField('CustomUser', related_name='wishlist', blank=True)
     tags = models.ManyToManyField('Tag', related_name='games', blank=True)
+    categories = models.ManyToManyField('Category', related_name='games', blank=True)
 
     def __repr__(self):
         return f"<Game title:{self.title}>"
@@ -79,6 +80,15 @@ class Tag(models.Model):
 
     def __repr__(self):
         return f"<Tag name:{self.name}>"
+
+    def __str__(self):
+        return f"{self.name}"
+
+class Category(models.Model):
+    name = models.CharField(max_length=150)
+
+    def __repr__(self):
+        return f"<Category name: {self.name}>"
 
     def __str__(self):
         return f"{self.name}"
