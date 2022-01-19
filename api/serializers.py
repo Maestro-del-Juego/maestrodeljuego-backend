@@ -171,6 +171,17 @@ class GameForGNDetailSerializer(serializers.ModelSerializer):
 class GameNightDetailSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer()
     invitees = ContactNestedSerializer(many=True)
+    games = GameListSerializer(many=True)
+    option1 = GameForGNDetailSerializer(read_only=True)
+    option2 = GameForGNDetailSerializer(read_only=True)
+    option3 = GameForGNDetailSerializer(read_only=True)
+    option4 = GameForGNDetailSerializer(read_only=True)
+    option5 = GameForGNDetailSerializer(read_only=True)
+    option6 = GameForGNDetailSerializer(read_only=True)
+    option7 = GameForGNDetailSerializer(read_only=True)
+    option8 = GameForGNDetailSerializer(read_only=True)
+    option9 = GameForGNDetailSerializer(read_only=True)
+    option10 = GameForGNDetailSerializer(read_only=True)
 
     class Meta:
         model = GameNight
