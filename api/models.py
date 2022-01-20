@@ -71,7 +71,6 @@ class GameNight(models.Model):
     invitees = models.ManyToManyField('Contact', related_name='invited')
     attendees = models.ManyToManyField('Contact', related_name='attended')
     games = models.ManyToManyField('Game', related_name='gamenights')
-    player_num = models.IntegerField()
     start_time = models.TimeField()
     end_time = models.TimeField(null=True)
     location = models.CharField(max_length=300)
