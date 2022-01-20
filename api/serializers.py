@@ -103,6 +103,31 @@ class GameNightSerializer(serializers.ModelSerializer):
         )
 
 
+class GameNightCreateSerializer(serializers.ModelSerializer):
+    user = UserNestedSerializer(read_only=True)
+
+    class Meta:
+        model = GameNight
+        fields = (
+            'user',
+            'date',
+            'invitees',
+            'start_time',
+            'end_time',
+            'location',
+            'option1',
+            'option2',
+            'option3',
+            'option4',
+            'option5',
+            'option6',
+            'option7',
+            'option8',
+            'option9',
+            'option10'
+        )
+
+
 class ContactNestedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
