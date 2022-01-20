@@ -228,3 +228,14 @@ class VotingSerializer(serializers.ModelSerializer):
             'option9',
             'option10',
         )
+
+
+class ContactListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Contact
+        fields = (
+            'first_name',
+            'last_name',
+            'email',
+        )
