@@ -27,5 +27,6 @@ urlpatterns = [
     path('wishlist/', views.WishListView.as_view(), name='user-wishlist'),
     path('gamenight/', views.GameNightView.as_view(), name='game-night'),
     path('gamenight/<int:year>/<int:month>/<int:day>/', views.GameNightDetailView.as_view(), name='game-night-detail'),
-    path('tags/', views.TagListView.as_view(), name='tag_list'),
+    path('gamenight/<int:year>/<int:month>/<int:day>/voting', views.VotingView.as_view(), name='game-night-votes'),
+    path('tags/', views.TagListView.as_view(), name='tag-list'),
 ]
