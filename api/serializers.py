@@ -68,16 +68,16 @@ class GameNightSerializer(serializers.ModelSerializer):
     invitees = serializers.StringRelatedField(read_only=True, many=True)
     attendees = serializers.StringRelatedField(read_only=True, many=True)
     games = serializers.SlugRelatedField(read_only=True, many=True, slug_field="title")
-    option1 = GameListSerializer(many=True, read_only=True)
-    option2 = GameListSerializer(many=True, read_only=True)
-    option3 = GameListSerializer(many=True, read_only=True)
-    option4 = GameListSerializer(many=True, read_only=True)
-    option5 = GameListSerializer(many=True, read_only=True)
-    option6 = GameListSerializer(many=True, read_only=True)
-    option7 = GameListSerializer(many=True, read_only=True)
-    option8 = GameListSerializer(many=True, read_only=True)
-    option9 = GameListSerializer(many=True, read_only=True)
-    option10 = GameListSerializer(many=True, read_only=True)
+    option1 = GameListSerializer(read_only=True)
+    option2 = GameListSerializer(read_only=True)
+    option3 = GameListSerializer(read_only=True)
+    option4 = GameListSerializer(read_only=True)
+    option5 = GameListSerializer(read_only=True)
+    option6 = GameListSerializer(read_only=True)
+    option7 = GameListSerializer(read_only=True)
+    option8 = GameListSerializer(read_only=True)
+    option9 = GameListSerializer(read_only=True)
+    option10 = GameListSerializer(read_only=True)
     class Meta:
         model = GameNight
         fields = (
@@ -86,7 +86,6 @@ class GameNightSerializer(serializers.ModelSerializer):
             'invitees',
             'attendees',
             'games',
-            'player_num',
             'start_time',
             'end_time',
             'location',
@@ -112,6 +111,7 @@ class GameNightCreateSerializer(serializers.ModelSerializer):
             'user',
             'date',
             'invitees',
+            'games',
             'start_time',
             'end_time',
             'location',
