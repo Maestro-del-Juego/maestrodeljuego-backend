@@ -61,6 +61,11 @@ class Game(models.Model):
 
 
 class GameNight(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'date'], name='unique-gamenight')
+        ]
+
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='gamenights')
     date = models.DateField()
     invitees = models.ManyToManyField('Contact', related_name='invited')
@@ -99,6 +104,7 @@ class Tag(models.Model):
         return f"{self.name}"
 
 class Category(models.Model):
+
     name = models.CharField(max_length=150)
 
     def __repr__(self):
@@ -109,6 +115,11 @@ class Category(models.Model):
 
 
 class Feedback(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['gamenight', 'attendee'], name='unique-feedback')
+        ]
+
     gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='feedback')
     attendee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='feedback')
     overall_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
@@ -128,6 +139,11 @@ class Feedback(models.Model):
 
 
 class Contact(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'first_name', 'last_name', 'email'], name='unique-contact')
+        ]
+
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='contacts', null=True)
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
@@ -141,6 +157,11 @@ class Contact(models.Model):
 
 
 class Voting(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['gamenight', 'invitee'], name='unique-vote')
+        ]
+
     gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='voting')
     invitee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='voting')
     option1 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
