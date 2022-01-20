@@ -260,6 +260,7 @@ class ContactListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = (
+            'id',
             'first_name',
             'last_name',
             'email',

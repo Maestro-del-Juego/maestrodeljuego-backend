@@ -30,4 +30,6 @@ urlpatterns = [
     path('gamenight/<int:year>/<int:month>/<int:day>/voting', views.VotingView.as_view(), name='game-night-votes'),
     path('tags/', views.TagListView.as_view(), name='tag-list'),
     path('contacts/', views.ContactListView.as_view(), name='contact_list'),
+    path('contacts/<int:pk>/', views.ContactUpdateView.as_view(), name='contact_update'),
+
 ]
