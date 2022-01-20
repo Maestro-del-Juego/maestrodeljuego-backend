@@ -63,14 +63,15 @@ class Game(models.Model):
 class GameNight(models.Model):
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'date'], name='unique-gamenight')
+            models.UniqueConstraint(fields=['user', 'date', 'rid'], name='unique-gamenight')
         ]
 
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='gamenights')
     date = models.DateField()
+    rid = models.CharField(max_length=15, null=True)
     invitees = models.ManyToManyField('Contact', related_name='invited')
     attendees = models.ManyToManyField('Contact', related_name='attended')
-    games = models.ManyToManyField('Game', related_name='gamenights')
+    games = models.ManyToManyField('Game', related_name='gamenights', blank=True)
     start_time = models.TimeField()
     end_time = models.TimeField(null=True)
     location = models.CharField(max_length=300)
