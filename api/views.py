@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Game, GameNight, Tag, Category
-from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer
+from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, VotingSerializer
 import requests, json, xmltodict, decimal
 from datetime import date
 
@@ -181,8 +181,18 @@ class GameNightDetailView(RetrieveUpdateAPIView):
         return queryset
 
     def get_object(self):
-        GN_date = date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
+        gamenight_date = date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
         queryset = self.filter_queryset(self.get_queryset())
-        obj = get_object_or_404(queryset, date=GN_date)
+        obj = get_object_or_404(queryset, date=gamenight_date)
         self.check_object_permissions(self.request, obj)
         return obj
+
+
+class VotingView(CreateAPIView):
+    serializer_class = VotingSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        gamenight_date = date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
+        gamenight = GameNight.objects.get(date=gamenight_date, user=user)
+        queryset = gamenight.voting.all()
