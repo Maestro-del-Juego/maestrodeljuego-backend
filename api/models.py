@@ -142,7 +142,7 @@ class Contact(models.Model):
 
 class Voting(models.Model):
     gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='voting')
-    contact = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='voting')
+    invitee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='voting')
     option1 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
     option2 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
     option3 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
