@@ -138,6 +138,8 @@ class GameNightCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameNight
         fields = (
+            'pk',
+            'rid',
             'user',
             'date',
             'invitees',
