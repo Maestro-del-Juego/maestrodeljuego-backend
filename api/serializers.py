@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, CustomUser, Tag, GameNight, Contact
+from .models import Game, CustomUser, Tag, GameNight, Contact, Voting
 from djoser.serializers import UserCreatePasswordRetypeSerializer
 
 
@@ -171,6 +171,7 @@ class GameForGNDetailSerializer(serializers.ModelSerializer):
 class GameNightDetailSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer()
     invitees = ContactNestedSerializer(many=True)
+    attendees = ContactNestedSerializer(many=True)
     games = GameListSerializer(many=True)
     option1 = GameForGNDetailSerializer(read_only=True)
     option2 = GameForGNDetailSerializer(read_only=True)
@@ -195,6 +196,27 @@ class GameNightDetailSerializer(serializers.ModelSerializer):
             'start_time',
             'end_time',
             'location',
+            'option1',
+            'option2',
+            'option3',
+            'option4',
+            'option5',
+            'option6',
+            'option7',
+            'option8',
+            'option9',
+            'option10',
+        )
+
+
+class VotingSerializer(serializers.ModelSerializer):
+    gamenight = serializers.StringRelatedField(read_only=True)
+    invitee = ContactNestedSerializer()
+    class Meta:
+        model = Voting
+        fields = (
+            'gamenight',
+            'invitee',
             'option1',
             'option2',
             'option3',
