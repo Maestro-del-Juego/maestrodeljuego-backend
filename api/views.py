@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Game, GameNight, Tag, Category, Contact
-from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactListSerializer, VotingSerializer
+from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactListSerializer, VotingSerializer, GameNightCreateSerializer
 import requests, json, xmltodict, decimal
 from datetime import date
 
@@ -158,6 +158,11 @@ class GameNightView(ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return GameNightCreateSerializer
+        return super().get_serializer_class()
 
 
 class TagListView(ListCreateAPIView):
