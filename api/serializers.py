@@ -110,6 +110,7 @@ class GameNightSerializer(serializers.ModelSerializer):
         model = GameNight
         fields = (
             'pk',
+            'rid',
             'user',
             'date',
             'invitees',
