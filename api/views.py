@@ -3,7 +3,7 @@ from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCrea
 from rest_framework.permissions import IsAuthenticated
 from .models import Game, GameNight, Tag, Category, Contact
 from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingSerializer, GameNightCreateSerializer
-import requests, json, xmltodict, decimal
+import requests, json, xmltodict, decimal, string, random
 from datetime import date
 
 
@@ -157,12 +157,22 @@ class GameNightView(ListCreateAPIView):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        rand_id = self.get_rid()
+        serializer.save(user=self.request.user, rid=rand_id)
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return GameNightCreateSerializer
         return super().get_serializer_class()
+
+    def get_rid(self):
+        '''
+        randomly generates 15-character long string
+        '''
+        rid = ''.join(random.choices(string.ascii_letters+string.digits, k=15))
+        while GameNight.objects.filter(rid=rid).exists():
+            rid = ''.join(random.choices(string.ascii_letters+string.digits, k=15))
+        return rid
 
 
 class TagListView(ListCreateAPIView):
