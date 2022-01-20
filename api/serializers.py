@@ -87,7 +87,7 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
             'votes',
         )
 
-    def get_votes(self):
+    def get_votes(self, obj):
         return 0
 
 
