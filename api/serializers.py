@@ -216,3 +216,5 @@ class VotingSerializer(serializers.ModelSerializer):
             'option9',
             'option10',
         )
+
+

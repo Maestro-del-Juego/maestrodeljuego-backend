@@ -232,3 +232,5 @@ class ContactUpdateView(RetrieveUpdateDestroyAPIView):
         user = self.request.user
         queryset = Contact.objects.filter(user_id=user.id)
         return queryset
+
+
