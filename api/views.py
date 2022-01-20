@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Game, GameNight, Tag, Category, Contact
 from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingSerializer, GameNightCreateSerializer
@@ -213,3 +213,12 @@ class VotingView(CreateAPIView):
         gamenight_date = date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
         gamenight = GameNight.objects.get(date=gamenight_date, user=user)
         queryset = gamenight.voting.all()
+
+
+class ContactUpdateView(RetrieveUpdateDestroyAPIView):
+    serializer_class = ContactSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Contact.objects.filter(user_id=user.id)
+        return queryset
