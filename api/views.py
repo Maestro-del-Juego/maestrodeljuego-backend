@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Game, GameNight, Tag, Category
-from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer
+from .models import Game, GameNight, Tag, Category, Contact
+from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactListSerializer
 import requests, json, xmltodict, decimal
 from datetime import date
 
@@ -186,3 +186,14 @@ class GameNightDetailView(RetrieveUpdateAPIView):
         obj = get_object_or_404(queryset, date=GN_date)
         self.check_object_permissions(self.request, obj)
         return obj
+
+class ContactListView(ListCreateAPIView):
+    serializer_class = ContactListSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Contact.objects.filter(user_id=user.id)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
