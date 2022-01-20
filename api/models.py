@@ -1,3 +1,4 @@
+from asyncio.proactor_events import constants
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -125,11 +126,6 @@ class Feedback(models.Model):
     overall_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     people_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
     location_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
-    game1_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
-    game2_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
-    game3_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
-    game4_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
-    game5_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
 
     def __repr__(self):
         return f"<Feedback contact:{self.attendee.first_name} {self.attendee.last_name}>"
@@ -180,3 +176,22 @@ class Voting(models.Model):
         
     def __str__(self):
         return f"Vote from {self.contact.first_name} {self.contact.last_name}"
+
+class GameFeedback(models.Model):
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['feedback', 'game'], name='unique-game-feedback')
+        ]
+    
+    feedback = models.ForeignKey('Feedback', on_delete=models.CASCADE, related_name='feedback')
+    game = models.ForeignKey('Game', on_delete=models.CASCADE, related_name='game')
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
+
+    def __repr__(self):
+        return f"<GameFeedback {self.game.title} by {self.feedback.attendee.first_name} {self.feedback.attendee.last_name}>"
+
+    def __str__(self):
+        return {self.feedback}
+
+        

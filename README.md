@@ -315,3 +315,70 @@ POST /gamenight/
 	"option9": null,
 	"option10": null
 }
+```
+## Create Contact
+
+Token authentication required. First name and last name are strings. Email needs to be a valid Email form.
+
+### Request
+
+```json
+POST /contacts/
+{
+	"first_name": "Kamasi",
+	"last_name": "Washington",
+	"email": "KWashington@iamawesome.com"
+}
+```
+
+### Response
+
+```json
+201 Created
+{
+	"first_name": "Kamasi",
+	"last_name": "Washington",
+	"email": "KWashington@iamawesome.com"
+}
+```
+## Update Contact
+
+Token authentication required. Request can contain any or all fields being changed.
+
+### Request
+
+```json
+PATCH /contacts/<int:pk>/
+{
+	"email": "KamasiW@superband.org"
+}
+```
+
+### Response
+
+```json
+200 OK
+{
+	"pk": 3,
+	"first_name": "Kamasi",
+	"last_name": "Washington",
+	"email": "KamasiW@superband.org"
+}
+```
+
+## Delete Contact
+### Request
+
+```json
+DELETE /contacts/<int:pk>/
+
+no body needed
+```
+
+### Response
+
+```json
+204 No Content
+
+No body returned for response
+```
