@@ -265,3 +265,53 @@ GET /wishlist/
     },
     (...)
 ]
+```
+
+
+## Create GameNight
+
+Token authentication required. Date field should be in the format of "YYYY-MM-DD". Time fields should be in the format "HH:MM", where the hour should be 0-24. The invitee field should be an array of contact pks. Option fields should be the game pk. A GameNight instance can have up to 10 game options.
+
+### Request
+
+```json
+POST /gamenight/
+{
+    "date": "2022-2-14",
+    "invitees": [4],
+    "start_time": "22:00",
+    "location": "Harold's",
+    "option1": 1,
+    "option2": 4
+}
+```
+
+### Response
+
+```json
+201 Created
+{
+	"user": {
+		"pk": 2,
+		"username": "cool_max",
+		"avatar": "https://s3-us-west-2.amazonaws.com/flx-editorial-wordpress/wp-content/uploads/2020/04/06125710/Goofy_Movie_Anniversary6.jpg"
+	},
+	"date": "2022-02-14",
+	"invitees": [
+		4
+	],
+    "games": [],
+	"start_time": "22:00:00",
+	"end_time": null,
+	"location": "Harold's",
+	"option1": 1,
+	"option2": 4,
+	"option3": null,
+	"option4": null,
+	"option5": null,
+	"option6": null,
+	"option7": null,
+	"option8": null,
+	"option9": null,
+	"option10": null
+}
