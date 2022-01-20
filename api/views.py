@@ -196,9 +196,9 @@ class GameNightDetailView(RetrieveUpdateAPIView):
         return queryset
 
     def get_object(self):
-        gamenight_date = date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
+        gamenight_rid = self.kwargs['rid']
         queryset = self.filter_queryset(self.get_queryset())
-        obj = get_object_or_404(queryset, date=gamenight_date)
+        obj = get_object_or_404(queryset, rid=gamenight_rid)
         self.check_object_permissions(self.request, obj)
         return obj
 
