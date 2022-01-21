@@ -1,3 +1,4 @@
+from telnetlib import STATUS
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -19,9 +20,16 @@ class GameNight(models.Model):
             models.UniqueConstraint(fields=['user', 'date', 'rid'], name='unique-gamenight')
         ]
 
+    STATUS_CHOICES = [
+        ('Voting', 'Voting'),
+        ('Finalized', 'Finalized'),
+        ('Cancelled', 'Cancelled')
+    ]
+
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='gamenights')
     date = models.DateField()
     rid = models.CharField(max_length=15, null=True)
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES, default='Voting')
     invitees = models.ManyToManyField('Contact', related_name='invited')
     attendees = models.ManyToManyField('Contact', related_name='attended')
     games = models.ManyToManyField('Game', related_name='gamenights', blank=True)
