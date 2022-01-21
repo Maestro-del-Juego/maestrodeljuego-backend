@@ -281,8 +281,7 @@ POST /gamenight/
     "invitees": [4],
     "start_time": "22:00",
     "location": "Harold's",
-    "option1": 1,
-    "option2": 4
+    "options": [1, 4]
 }
 ```
 
@@ -304,18 +303,69 @@ POST /gamenight/
 	"start_time": "22:00:00",
 	"end_time": null,
 	"location": "Harold's",
-	"option1": 1,
-	"option2": 4,
-	"option3": null,
-	"option4": null,
-	"option5": null,
-	"option6": null,
-	"option7": null,
-	"option8": null,
-	"option9": null,
-	"option10": null
+	"options": [1, 4]
 }
 ```
+
+
+## See GameNight Detail
+
+The string after `/gamenight/` should correspond to the specified GameNight's rid.
+
+### Request
+
+```json
+GET /gamenight/jcNexbI53C5Ij0X
+```
+
+### Response
+
+```json
+200 OK
+{
+	"pk": 5,
+	"rid": "jcNexbI53C5Ij0X",
+	"user": {
+		"pk": 2,
+		"username": "cool_max",
+		"avatar": "https://s3-us-west-2.amazonaws.com/flx-editorial-wordpress/wp-content/uploads/2020/04/06125710/Goofy_Movie_Anniversary6.jpg"
+	},
+	"date": "2022-02-14",
+	"invitees": [
+		{
+			"pk": 1,
+			"first_name": "Mickey",
+			"last_name": "Mouse",
+			"email": "none@example.com"
+		}
+	],
+	"attendees": [],
+	"games": [],
+	"start_time": "21:00:00",
+	"end_time": null,
+	"location": "Coffee Shop",
+	"options": [
+		{
+			"pk": 1,
+			"bgg": 1406,
+			"title": "Monopoly",
+			"pub_year": 1933,
+			"image": "https://cf.geekdo-images.com/9nGoBZ0MRbi6rdH47sj2Qg__original/img/bA8irydTCNlE38QSzM9EhcUIuNU=/0x0/filters:format(jpeg)/pic5786795.jpg",
+			"votes": 0
+		},
+		{
+			"pk": 4,
+			"bgg": 278,
+			"title": "Catan Card Game",
+			"pub_year": 1996,
+			"image": "https://cf.geekdo-images.com/CRCOv0p4FgZaze_3fGuhIA__original/img/OiugGzMENFVOzMTKBFZnEVOPzto=/0x0/filters:format(jpeg)/pic706443.jpg",
+			"votes": 0
+		}
+	]
+}
+```
+
+
 ## Create Contact
 
 Token authentication required. First name and last name are strings. Email needs to be a valid Email form.
@@ -336,6 +386,7 @@ POST /contacts/
 ```json
 201 Created
 {
+	"pk": 3,
 	"first_name": "Kamasi",
 	"last_name": "Washington",
 	"email": "KWashington@iamawesome.com"
@@ -381,4 +432,59 @@ no body needed
 204 No Content
 
 No body returned for response
+```
+
+
+## Submit Votes for GameNight
+
+The string after `/gamenight/` should correspond to the specified GameNight's rid. The array should contain one JSON object for each game in the GameNight's options field. If the invitee does not vote for a game, omit the vote field for that game or give it a value of 0. The gamenight, invitee (read: Contact), and game field values should correspond to the objects' pks. Once an invitee has submitted a vote, they cannot vote again.
+
+### Request
+POST /gamenight/jcNexbI53C5Ij0X/voting/
+```json
+[
+	{
+		"gamenight": 5,
+		"invitee": 1,
+		"game": 1,
+		"vote": 1
+	},
+	{
+		"gamenight": 5,
+		"invitee": 1,
+		"game": 4,
+		"vote": -1
+	},
+	{
+		"gamenight": 5,
+		"invitee": 1,
+		"game": 23
+	}
+]
+```
+
+### Response
+
+```json
+201 Created
+[
+	{
+		"gamenight": 5,
+		"invitee": 1,
+		"game": 1,
+		"vote": 1
+	},
+	{
+		"gamenight": 5,
+		"invitee": 1,
+		"game": 4,
+		"vote": -1
+	},
+	{
+		"gamenight": 5,
+		"invitee": 1,
+		"game": 23,
+		"vote": 0
+	}
+]
 ```
