@@ -151,14 +151,14 @@ class WishListView(ListAPIView):
 
 
 class GameNightView(ListCreateAPIView):
-    queryset = GameNight.objects.all()
+    # queryset = GameNight.objects.all()
     serializer_class = GameNightSerializer
-    permission_classes = [IsAuthorOrReadOnly]
+    # permission_classes = [IsAuthorOrReadOnly]
 
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     queryset = GameNight.objects.filter(user_id=user.id)
-    #     return queryset
+    def get_queryset(self):
+        user = self.request.user
+        queryset = GameNight.objects.filter(user_id=user.id)
+        return queryset
 
     def perform_create(self, serializer):
         rand_id = self.get_rid()
@@ -192,12 +192,14 @@ class TagListView(ListCreateAPIView):
 
 
 class GameNightDetailView(RetrieveUpdateAPIView):
+    queryset = GameNight.objects.all()
     serializer_class = GameNightSerializer
+    permission_classes = [IsAuthorOrReadOnly]
 
-    def get_queryset(self):
-        user = self.request.user
-        queryset = user.gamenights.all()
-        return queryset
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     queryset = user.gamenights.all()
+    #     return queryset
 
     def get_object(self):
         gamenight_rid = self.kwargs['rid']
