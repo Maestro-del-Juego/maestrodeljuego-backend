@@ -145,7 +145,7 @@ class Contact(models.Model):
 class Voting(models.Model):
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['gamenight', 'invitee'], name='unique-vote')
+            models.UniqueConstraint(fields=['gamenight', 'invitee', 'game'], name='unique-vote')
         ]
 
     gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='voting')
