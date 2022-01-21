@@ -1,4 +1,6 @@
-from rest_framework import permissions, SAFE_METHODS
+from rest_framework import permissions
+
+SAFE_METHODS = ('GET', 'OPTIONS', 'HEAD')
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
