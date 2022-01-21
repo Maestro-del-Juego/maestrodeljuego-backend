@@ -88,14 +88,19 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
         )
 
     def get_votes(self, obj):
-        return 0
+        view = self.context.get('view')
+        # breakpoint()
+        rid = view.kwargs['rid']
+        gamenight = GameNight.objects.get(rid=rid)
+        votes = obj.tally_votes(gamenight)
+        return votes
 
 
 class GameNightSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer(read_only=True)
     invitees = ContactSerializer(many=True)
     attendees = ContactSerializer(many=True)
-    games = serializers.SlugRelatedField(read_only=True, many=True, slug_field="title")
+    games = GameListSerializer(read_only=True, many=True)
     options = GameForGameNightSerializer(read_only=True, many=True)
 
     class Meta:
