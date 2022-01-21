@@ -3,6 +3,7 @@ from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCrea
 from rest_framework.permissions import IsAuthenticated
 from .models import Game, GameNight, Tag, Category, Contact
 from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingCreateSerializer, VotingSerializer, GameNightCreateSerializer
+from .permissions import IsAuthorOrReadOnly
 import requests, json, xmltodict, decimal, string, random
 from datetime import date
 from rest_framework import status
@@ -150,13 +151,14 @@ class WishListView(ListAPIView):
 
 
 class GameNightView(ListCreateAPIView):
+    queryset = GameNight.objects.all()
     serializer_class = GameNightSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthorOrReadOnly]
 
-    def get_queryset(self):
-        user = self.request.user
-        queryset = GameNight.objects.filter(user_id=user.id)
-        return queryset
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     queryset = GameNight.objects.filter(user_id=user.id)
+    #     return queryset
 
     def perform_create(self, serializer):
         rand_id = self.get_rid()
