@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Game, GameNight, Tag, Category, Contact
-from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingSerializer, GameNightCreateSerializer
+from .models import Game, GameNight, Tag, Category, Contact, Feedback, GameFeedback 
+from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingSerializer, GameNightCreateSerializer, FeedbackSerializer
 import requests, json, xmltodict, decimal, string, random
 from datetime import date
 
@@ -234,3 +234,15 @@ class ContactUpdateView(RetrieveUpdateDestroyAPIView):
         return queryset
 
 
+#TRYING TO FILTER BY USER AND RID?
+class FeedbackView(CreateAPIView):
+    serializer_class = FeedbackSerializer
+
+    def get_queryset(self):
+        # gamenight_rid = self.request.gamenight
+        user = self.request.user
+        queryset = Feedback.objects.filter(user_id=user.id)
+        return queryset
+
+class GameFeedbackView(CreateAPIView):
+    pass

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, CustomUser, Tag, GameNight, Contact, Voting
+from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, Feedback
 from djoser.serializers import UserCreatePasswordRetypeSerializer
 
 
@@ -217,4 +217,17 @@ class VotingSerializer(serializers.ModelSerializer):
             'option10',
         )
 
+
+#CONFUSED HOW GAMEFEEDBACK MODEL FITS IN HERE
+class FeedbackSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Feedback
+        fields = (
+            'gamenight',
+            'attendee',
+            'overall_rating',
+            'people_rating',
+            'location_rating',
+        )
 
