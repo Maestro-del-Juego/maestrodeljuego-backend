@@ -157,7 +157,7 @@ class GameNightView(ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = GameNight.objects.filter(user_id=user.id)
+        queryset = user.gamenights.all()
         return queryset
 
     def perform_create(self, serializer):
