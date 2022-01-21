@@ -96,16 +96,8 @@ class GameNightSerializer(serializers.ModelSerializer):
     invitees = ContactSerializer(many=True)
     attendees = ContactSerializer(many=True)
     games = serializers.SlugRelatedField(read_only=True, many=True, slug_field="title")
-    option1 = GameForGameNightSerializer(read_only=True)
-    option2 = GameForGameNightSerializer(read_only=True)
-    option3 = GameForGameNightSerializer(read_only=True)
-    option4 = GameForGameNightSerializer(read_only=True)
-    option5 = GameForGameNightSerializer(read_only=True)
-    option6 = GameForGameNightSerializer(read_only=True)
-    option7 = GameForGameNightSerializer(read_only=True)
-    option8 = GameForGameNightSerializer(read_only=True)
-    option9 = GameForGameNightSerializer(read_only=True)
-    option10 = GameForGameNightSerializer(read_only=True)
+    options = GameForGameNightSerializer(read_only=True, many=True)
+
     class Meta:
         model = GameNight
         fields = (
@@ -119,16 +111,7 @@ class GameNightSerializer(serializers.ModelSerializer):
             'start_time',
             'end_time',
             'location',
-            'option1',
-            'option2',
-            'option3',
-            'option4',
-            'option5',
-            'option6',
-            'option7',
-            'option8',
-            'option9',
-            'option10'
+            'options'
         )
 
 
@@ -147,16 +130,7 @@ class GameNightCreateSerializer(serializers.ModelSerializer):
             'start_time',
             'end_time',
             'location',
-            'option1',
-            'option2',
-            'option3',
-            'option4',
-            'option5',
-            'option6',
-            'option7',
-            'option8',
-            'option9',
-            'option10'
+            'options'
         )
 
 
@@ -205,16 +179,17 @@ class VotingSerializer(serializers.ModelSerializer):
         fields = (
             'gamenight',
             'invitee',
-            'option1',
-            'option2',
-            'option3',
-            'option4',
-            'option5',
-            'option6',
-            'option7',
-            'option8',
-            'option9',
-            'option10',
+            'game',
+            'vote'
         )
 
 
+class VotingCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Voting
+        fields = (
+            'gamenight',
+            'invitee',
+            'game',
+            'vote'
+        )
