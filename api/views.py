@@ -2,9 +2,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Game, GameNight, Tag, Category, Contact
-from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingSerializer, GameNightCreateSerializer
+from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingCreateSerializer, VotingSerializer, GameNightCreateSerializer
 import requests, json, xmltodict, decimal, string, random
 from datetime import date
+from rest_framework import status
+from rest_framework.response import Response
 
 
 class LibraryView(ListAPIView):
@@ -223,6 +225,19 @@ class VotingView(CreateAPIView):
         gamenight_date = date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
         gamenight = GameNight.objects.get(date=gamenight_date, user=user)
         queryset = gamenight.voting.all()
+        return queryset
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return VotingCreateSerializer
+        return super().get_serializer_class()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class ContactUpdateView(RetrieveUpdateDestroyAPIView):
