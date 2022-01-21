@@ -1,4 +1,3 @@
-from asyncio.proactor_events import constants
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -76,16 +75,7 @@ class GameNight(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField(null=True)
     location = models.CharField(max_length=300)
-    option1 = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name='option1', blank=True, null=True)
-    option2 = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name='option2', blank=True, null=True)
-    option3 = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name='option3', blank=True, null=True)
-    option4 = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name='option4', blank=True, null=True)
-    option5 = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name='option5', blank=True, null=True)
-    option6 = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name='option6', blank=True, null=True)
-    option7 = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name='option7', blank=True, null=True)
-    option8 = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name='option8', blank=True, null=True)
-    option9 = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name='option9', blank=True, null=True)
-    option10 = models.ForeignKey('Game', on_delete=models.DO_NOTHING, related_name='option10', blank=True, null=True)
+    options = models.ManyToManyField('Game', related_name='options', blank=True)
 
     def __repr__(self):
         return f"<GameNight date:{self.date}>"
@@ -155,24 +145,16 @@ class Contact(models.Model):
 class Voting(models.Model):
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['gamenight', 'invitee'], name='unique-vote')
+            models.UniqueConstraint(fields=['gamenight', 'invitee', 'game'], name='unique-vote')
         ]
 
     gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='voting')
     invitee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='voting')
-    option1 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
-    option2 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
-    option3 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
-    option4 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
-    option5 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
-    option6 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
-    option7 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
-    option8 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
-    option9 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
-    option10 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)], blank=True)
-    
+    game = models.ForeignKey('Game', on_delete=models.CASCADE, related_name='voting')
+    vote = models.IntegerField(validators=[MinValueValidator(-1), MaxValueValidator(1)], default=0)
+
     def __repr__(self) -> str:
-        return f"<Voting name:{self.contact.first_name} {self.contact.last_name}>"
+        return f"<Vote game: {self.game.title} name: {self.contact.first_name} {self.contact.last_name}>"
         
     def __str__(self):
         return f"Vote from {self.contact.first_name} {self.contact.last_name}"
@@ -190,8 +172,3 @@ class GameFeedback(models.Model):
 
     def __repr__(self):
         return f"<GameFeedback {self.game.title} by {self.feedback.attendee.first_name} {self.feedback.attendee.last_name}>"
-
-    def __str__(self):
-        return {self.feedback}
-
-        
