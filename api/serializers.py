@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Game, CustomUser, Tag, GameNight, Contact, Voting
 from djoser.serializers import UserCreatePasswordRetypeSerializer
+from django.db.models.query import QuerySet
 
 
 class GameListSerializer(serializers.ModelSerializer):
@@ -88,13 +89,13 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
         )
 
     def get_votes(self, obj):
-        # view = self.context.get('view')
-        # # breakpoint()
-        # rid = view.kwargs['rid']
-        # gamenight = GameNight.objects.get(rid=rid)
-        # votes = obj.tally_votes(gamenight)
-        # return votes
-        return 0
+        serialized_instance = self.parent.parent.instance
+        if isinstance(serialized_instance, QuerySet):
+            gamenight = serialized_instance[0]
+        else:
+            gamenight = serialized_instance
+        votes = obj.tally_votes(gamenight)
+        return votes
 
 
 class GameNightSerializer(serializers.ModelSerializer):
