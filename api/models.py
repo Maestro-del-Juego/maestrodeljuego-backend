@@ -44,6 +44,15 @@ class GameNight(models.Model):
     def __str__(self):
         return f"{self.date}"
 
+    def update_attendees(self, contact_pk):
+        attendees_list = self.attendees
+        contact = Contact.objects.get(pk=contact_pk)
+        if contact in self.invitees.all():
+            if contact in attendees_list.all():
+                attendees_list.remove(contact)
+            else:
+                attendees_list.add(contact)
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=150)
@@ -188,3 +197,11 @@ class Game(models.Model):
             votes += ballot.vote
 
         return votes
+
+    def calc_feedback(self, gamenight):
+        ballots = GameFeedback.objects.filter(game=self, gamenight=gamenight)
+        total = 0
+        for ballot in ballots:
+            total += ballot.rating
+        average = total/len(ballots)
+        return round(average, 2)

@@ -202,11 +202,24 @@ class GameNightDetailView(RetrieveUpdateAPIView):
     #     return queryset
 
     def get_object(self):
+        '''
+        overridden to grab GameNight object based on rid in the URL
+        '''
         gamenight_rid = self.kwargs['rid']
         queryset = self.filter_queryset(self.get_queryset())
         obj = get_object_or_404(queryset, rid=gamenight_rid)
         self.check_object_permissions(self.request, obj)
         return obj
+
+    def perform_update(self, serializer):
+        gamenight = self.get_object()
+        data = self.request.data
+        if 'attendees' in data:
+            contacts = data['attendees']
+            for contact in contacts:
+                pk = contact['pk']
+                gamenight.update_attendees(pk)
+        gamenight.save()
 
 
 class ContactListView(ListCreateAPIView):
