@@ -53,6 +53,34 @@ class GameNight(models.Model):
             else:
                 attendees_list.add(contact)
 
+    def update_invitees(self, contact_pk):
+        invitees_list = self.invitees
+        contact = Contact.objects.get(pk=contact_pk)
+        if contact in invitees_list.all():
+            invitees_list.remove(contact)
+            if contact in self.attendees.all():
+                self.attendees.remove(contact)
+        else:
+            invitees_list.add(contact)
+
+    def update_options(self, game_pk):
+        options_list = self.options
+        game = Game.objects.get(pk=game_pk)
+        if game in options_list.all():
+            options_list.remove(game)
+            if game in self.games.all():
+                self.games.remove(game)
+        else:
+            options_list.add(game)
+
+    def update_games(self, game_pk):
+        games_list = self.games
+        game = Game.objects.get(pk=game_pk)
+        if game in games_list.all():
+            games_list.remove(game)
+        else:
+            games_list.add(game)
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=150)
