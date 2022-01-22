@@ -76,10 +76,11 @@ class GameNight(models.Model):
     def update_games(self, game_pk):
         games_list = self.games
         game = Game.objects.get(pk=game_pk)
-        if game in games_list.all():
-            games_list.remove(game)
-        else:
-            games_list.add(game)
+        if game in self.options.all():
+            if game in games_list.all():
+                games_list.remove(game)
+            else:
+                games_list.add(game)
 
 
 class Tag(models.Model):
