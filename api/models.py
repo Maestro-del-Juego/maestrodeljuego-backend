@@ -44,9 +44,14 @@ class GameNight(models.Model):
     def __str__(self):
         return f"{self.date}"
 
-    def update_attendess(self, attendee_pk):
+    def update_attendees(self, contact_pk):
         attendees_list = self.attendees
-        
+        contact = Contact.objects.get(pk=contact_pk)
+        if contact in self.invitees.all():
+            if contact in attendees_list.all():
+                attendees_list.remove(contact)
+            else:
+                attendees_list.add(contact)
 
 
 class Tag(models.Model):
