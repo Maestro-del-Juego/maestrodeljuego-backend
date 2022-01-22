@@ -91,9 +91,8 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
     def get_votes(self, obj):
         serialized_instance = self.parent.parent.instance
         if isinstance(serialized_instance, QuerySet):
-            gamenight = serialized_instance[0]
-        else:
-            gamenight = serialized_instance
+            return None
+        gamenight = serialized_instance
         votes = obj.tally_votes(gamenight)
         return votes
 
