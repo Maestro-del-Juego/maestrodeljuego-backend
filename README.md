@@ -315,7 +315,7 @@ The string after `/gamenight/` should correspond to the specified GameNight's ri
 ### Request
 
 ```json
-GET /gamenight/jcNexbI53C5Ij0X
+GET /gamenight/jcNexbI53C5Ij0X/
 ```
 
 ### Response
@@ -352,6 +352,78 @@ GET /gamenight/jcNexbI53C5Ij0X
 			"pub_year": 1933,
 			"image": "https://cf.geekdo-images.com/9nGoBZ0MRbi6rdH47sj2Qg__original/img/bA8irydTCNlE38QSzM9EhcUIuNU=/0x0/filters:format(jpeg)/pic5786795.jpg",
 			"votes": 0
+		},
+		{
+			"pk": 4,
+			"bgg": 278,
+			"title": "Catan Card Game",
+			"pub_year": 1996,
+			"image": "https://cf.geekdo-images.com/CRCOv0p4FgZaze_3fGuhIA__original/img/OiugGzMENFVOzMTKBFZnEVOPzto=/0x0/filters:format(jpeg)/pic706443.jpg",
+			"votes": 0
+		}
+	]
+}
+```
+
+
+## Update GameNight
+
+Token authentication required. When updating the attendees field, be sure to only include the contacts that you intend to add/remove. Also, the contact must already be in the invitees field. The value should be an array of objects with only the "pk" key.
+
+### Request
+
+```json
+POST /gamenight/jcNexbI53C5Ij0X/
+{
+	"start_time": "19:00",
+	"end_time": "21:00",
+	"attendees": [
+		{"pk": 1}
+	]
+}
+```
+
+### Response
+
+```json
+200 OK
+{
+	"pk": 5,
+	"rid": "jcNexbI53C5Ij0X",
+	"user": {
+		"pk": 2,
+		"username": "cool_max",
+		"avatar": "https://s3-us-west-2.amazonaws.com/flx-editorial-wordpress/wp-content/uploads/2020/04/06125710/Goofy_Movie_Anniversary6.jpg"
+	},
+	"date": "2022-02-14",
+	"invitees": [
+		{
+			"pk": 1,
+			"first_name": "Mickey",
+			"last_name": "Mouse",
+			"email": "none@example.com"
+		}
+	],
+	"attendees": [
+		{
+			"pk": 1,
+			"first_name": "Mickey",
+			"last_name": "Mouse",
+			"email": "none@example.com"
+		}
+	],
+	"games": [],
+	"start_time": "19:00:00",
+	"end_time": "21:00:00",
+	"location": "Coffee Shop",
+	"options": [
+		{
+			"pk": 1,
+			"bgg": 1406,
+			"title": "Monopoly",
+			"pub_year": 1933,
+			"image": "https://cf.geekdo-images.com/9nGoBZ0MRbi6rdH47sj2Qg__original/img/bA8irydTCNlE38QSzM9EhcUIuNU=/0x0/filters:format(jpeg)/pic5786795.jpg",
+			"votes": 1
 		},
 		{
 			"pk": 4,
