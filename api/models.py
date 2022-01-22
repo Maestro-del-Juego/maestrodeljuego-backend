@@ -44,6 +44,10 @@ class GameNight(models.Model):
     def __str__(self):
         return f"{self.date}"
 
+    def update_attendess(self, attendee_pk):
+        attendees_list = self.attendees
+        
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=150)
