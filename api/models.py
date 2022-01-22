@@ -188,3 +188,11 @@ class Game(models.Model):
             votes += ballot.vote
 
         return votes
+
+    def calc_feedback(self, gamenight):
+        ballots = GameFeedback.objects.filter(game=self, gamenight=gamenight)
+        total = 0
+        for ballot in ballots:
+            total += ballot.rating
+        average = total/len(ballots)
+        return round(average, 2)
