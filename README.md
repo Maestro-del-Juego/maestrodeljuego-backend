@@ -368,12 +368,12 @@ GET /gamenight/jcNexbI53C5Ij0X/
 
 ## Update GameNight
 
-Token authentication required. When updating the invitees/attendees/options/games field, be sure to only include the contacts/games that you intend to add/remove. The value should be an array of objects with only the pk key-value pairs. In order to add a game to the games field, it must be in the options field. In order to add a contact to the attendees field, it must be in the invitees field.
+Token authentication required. When updating the invitees/attendees/options/games field, be sure to only include the contacts/games that you intend to add/remove. The value should be an array of objects with only the pk key-value pairs. In order to add a game to the games field, it must be in the options field. In order to add a contact to the attendees field, it must be in the invitees field. The available choices for the "status" field are "Voting", "Finalized", and "Cancelled". The format for the "start_time", "end_time", and "date" fields remains the same as when creating a new GameNight.
 
 ### Request
 
 ```json
-POST /gamenight/jcNexbI53C5Ij0X/
+PATCH /gamenight/jcNexbI53C5Ij0X/
 {
 	"start_time": "19:00",
 	"end_time": "21:00",
@@ -396,6 +396,7 @@ POST /gamenight/jcNexbI53C5Ij0X/
 		"avatar": "https://s3-us-west-2.amazonaws.com/flx-editorial-wordpress/wp-content/uploads/2020/04/06125710/Goofy_Movie_Anniversary6.jpg"
 	},
 	"date": "2022-02-14",
+	"status": "Voting",
 	"invitees": [
 		{
 			"pk": 1,
