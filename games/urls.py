@@ -31,7 +31,7 @@ urlpatterns = [
     path('gamenight/<str:rid>/feedback/', views.GeneralFeedbackView.as_view(), name='game-night-feedback'),
     path('gamenight/<str:rid>/gamefeedback/', views.GameFeedbackView.as_view(), name='indiv-game-feedback'),
     path('tags/', views.TagListView.as_view(), name='tag-list'),
-    path('contacts/', views.ContactListView.as_view(), name='contact_list'),
-    path('contacts/<int:pk>/', views.ContactUpdateView.as_view(), name='contact_update'),
-
+    path('contacts/', views.ContactListView.as_view(), name='contact-list'),
+    path('contacts/<int:pk>/', views.ContactUpdateView.as_view(), name='contact-update'),
+    path('gamenight/<str:rid>/RSVP/', views.RSVPListCreateView.as_view(), name='game-night-RSVP'),
 ]
