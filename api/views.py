@@ -219,22 +219,27 @@ class GameNightDetailView(RetrieveUpdateAPIView):
             for contact in contacts:
                 pk = contact['pk']
                 gamenight.update_attendees(pk)
+                gamenight.save()
         elif 'invitees' in data:
             contacts = data['invitees']
             for contact in contacts:
                 pk = contact['pk']
                 gamenight.update_invitees(pk)
+                gamenight.save()
         elif 'options' in data:
             games = data['options']
             for game in games:
                 pk = game['pk']
                 gamenight.update_options(pk)
+                gamenight.save()
         elif 'games' in data:
             games = data['games']
             for game in games:
                 pk = game['pk']
                 gamenight.update_games(pk)
-        gamenight.save()
+                gamenight.save()
+        else:
+            serializer.save()
 
 
 class ContactListView(ListCreateAPIView):
