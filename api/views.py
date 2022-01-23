@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Game, GameNight, Tag, Category, Contact
-from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingCreateSerializer, VotingSerializer, GameNightCreateSerializer
+from .models import Game, GameNight, Tag, Category, Contact, GeneralFeedback, GameFeedback 
+from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingCreateSerializer, VotingSerializer, GameNightCreateSerializer, GeneralFeedbackSerializer, GameFeedbackSerializer
 from .permissions import IsAuthorOrReadOnly
 import requests, json, xmltodict, decimal, string, random
 from datetime import date
@@ -253,9 +253,8 @@ class VotingView(CreateAPIView):
     serializer_class = VotingSerializer
 
     def get_queryset(self):
-        user = self.request.user
-        gamenight_date = date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
-        gamenight = GameNight.objects.get(date=gamenight_date, user=user)
+        gamenight_rid = self.kwargs['rid']
+        gamenight = GameNight.objects.get(rid=gamenight_rid)
         queryset = gamenight.voting.all()
         return queryset
 
@@ -279,5 +278,30 @@ class ContactUpdateView(RetrieveUpdateDestroyAPIView):
         user = self.request.user
         queryset = Contact.objects.filter(user_id=user.id)
         return queryset
+
+
+class GeneralFeedbackView(CreateAPIView):
+    serializer_class = GeneralFeedbackSerializer
+    queryset = GeneralFeedback.objects.all()
+
+    # def get_queryset(self):
+    #     gamenight_rid = self.kwargs['rid']
+    #     gamenight = GeneralFeedback.objects.get(rid=gamenight_rid)
+    #     queryset = gamenight.feedback.all()
+    #     return queryset
+
+
+class GameFeedbackView(CreateAPIView):
+    serializer_class = GameFeedbackSerializer
+    queryset = GameFeedback.objects.all()
+    
+    # def get_queryset(self):
+    #     gamenight_rid = self.kwargs['rid']
+    #     gamenight = GameFeedback.objects.get(rid=gamenight_rid)
+    #     queryset = gamenight.feedback.all()
+    #     return queryset
+
+
+
 
 

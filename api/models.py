@@ -104,23 +104,23 @@ class Category(models.Model):
         return f"{self.name}"
 
 
-class Feedback(models.Model):
+class GeneralFeedback(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['gamenight', 'attendee'], name='unique-feedback')
         ]
 
-    gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='feedback')
-    attendee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='feedback')
+    gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='generalfeedback')
+    attendee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='generalfeedback')
     overall_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     people_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
     location_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
 
     def __repr__(self):
-        return f"<Feedback contact:{self.attendee.first_name} {self.attendee.last_name}>"
+        return f"<GeneralFeedback contact:{self.attendee.first_name} {self.attendee.last_name}>"
 
     def __str__(self):
-        return f"Feedback from {self.attendee.first_name} {self.attendee.last_name}"
+        return f"GeneralFeedback from {self.attendee.first_name} {self.attendee.last_name}"
 
 
 class Contact(models.Model):
@@ -162,11 +162,11 @@ class GameFeedback(models.Model):
     
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['feedback', 'game'], name='unique-game-feedback')
+            models.UniqueConstraint(fields=['gamenight', 'attendee', 'game'], name='unique-game-feedback')
         ]
-    
-    feedback = models.ForeignKey('Feedback', on_delete=models.CASCADE, related_name='feedback')
-    game = models.ForeignKey('Game', on_delete=models.CASCADE, related_name='game')
+    gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='gamefeedback', null=True)
+    attendee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='gamefeedback', null=True)
+    game = models.ForeignKey('Game', on_delete=models.CASCADE, related_name='gamefeedback')
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
 
     def __repr__(self):
