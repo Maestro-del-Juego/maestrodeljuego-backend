@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, GeneralFeedback, GameFeedback
 from djoser.serializers import UserCreatePasswordRetypeSerializer
 from drf_writable_nested import WritableNestedModelSerializer, UniqueFieldsMixin, NestedCreateMixin
+from django.db.models.query import QuerySet
+
 
 class GameListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,6 +77,7 @@ class ContactSerializer(serializers.ModelSerializer):
 
 class GameForGameNightSerializer(serializers.ModelSerializer):
     votes = serializers.SerializerMethodField()
+    # feedback = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
@@ -85,17 +88,31 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
             'pub_year',
             'image',
             'votes',
+            # 'feedback',
         )
 
     def get_votes(self, obj):
-        return 0
+        serialized_instance = self.parent.parent.instance
+        if isinstance(serialized_instance, QuerySet):
+            return None
+        gamenight = serialized_instance
+        votes = obj.tally_votes(gamenight)
+        return votes
+
+    # def get_feedback(self, obj):
+    #     serialized_instance = self.parent.parent.instance
+    #     if isinstance(serialized_instance, QuerySet):
+    #         return None
+    #     gamenight = serialized_instance
+    #     rating = obj.calc_feedback(gamenight)
+    #     return rating
 
 
 class GameNightSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer(read_only=True)
     invitees = ContactSerializer(many=True)
     attendees = ContactSerializer(many=True)
-    games = serializers.SlugRelatedField(read_only=True, many=True, slug_field="title")
+    games = GameListSerializer(read_only=True, many=True)
     options = GameForGameNightSerializer(read_only=True, many=True)
 
     class Meta:

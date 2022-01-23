@@ -2,7 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Game, GameNight, Tag, Category, Contact, GeneralFeedback, GameFeedback 
-from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingSerializer, GameNightCreateSerializer, GeneralFeedbackSerializer, VotingCreateSerializer, GameFeedbackSerializer
+from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingCreateSerializer, VotingSerializer, GameNightCreateSerializer, GeneralFeedbackSerializer, GameFeedbackSerializer
+from .permissions import IsAuthorOrReadOnly
 import requests, json, xmltodict, decimal, string, random
 from datetime import date
 from rest_framework import status
@@ -150,12 +151,13 @@ class WishListView(ListAPIView):
 
 
 class GameNightView(ListCreateAPIView):
+    # queryset = GameNight.objects.all()
     serializer_class = GameNightSerializer
-    # permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthorOrReadOnly]
 
     def get_queryset(self):
         user = self.request.user
-        queryset = GameNight.objects.filter(user_id=user.id)
+        queryset = user.gamenights.all()
         return queryset
 
     def perform_create(self, serializer):
@@ -190,19 +192,49 @@ class TagListView(ListCreateAPIView):
 
 
 class GameNightDetailView(RetrieveUpdateAPIView):
+    queryset = GameNight.objects.all()
     serializer_class = GameNightSerializer
+    permission_classes = [IsAuthorOrReadOnly]
 
-    def get_queryset(self):
-        user = self.request.user
-        queryset = user.gamenights.all()
-        return queryset
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     queryset = user.gamenights.all()
+    #     return queryset
 
     def get_object(self):
+        '''
+        overridden to grab GameNight object based on rid in the URL
+        '''
         gamenight_rid = self.kwargs['rid']
         queryset = self.filter_queryset(self.get_queryset())
         obj = get_object_or_404(queryset, rid=gamenight_rid)
         self.check_object_permissions(self.request, obj)
         return obj
+
+    def perform_update(self, serializer):
+        gamenight = self.get_object()
+        data = self.request.data
+        if 'attendees' in data:
+            contacts = data['attendees']
+            for contact in contacts:
+                pk = contact['pk']
+                gamenight.update_attendees(pk)
+        elif 'invitees' in data:
+            contacts = data['invitees']
+            for contact in contacts:
+                pk = contact['pk']
+                gamenight.update_invitees(pk)
+        elif 'options' in data:
+            games = data['options']
+            for game in games:
+                pk = game['pk']
+                gamenight.update_options(pk)
+        elif 'games' in data:
+            games = data['games']
+            for game in games:
+                pk = game['pk']
+                gamenight.update_games(pk)
+        gamenight.save()
 
 
 class ContactListView(ListCreateAPIView):
