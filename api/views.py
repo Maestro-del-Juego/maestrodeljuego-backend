@@ -238,8 +238,7 @@ class GameNightDetailView(RetrieveUpdateAPIView):
                 pk = game['pk']
                 gamenight.update_games(pk)
                 gamenight.save()
-        else:
-            serializer.save()
+        serializer.save()
 
 
 class ContactListView(ListCreateAPIView):
