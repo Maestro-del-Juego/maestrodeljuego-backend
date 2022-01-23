@@ -368,7 +368,7 @@ GET /gamenight/jcNexbI53C5Ij0X/
 
 ## Update GameNight
 
-Token authentication required. When updating the attendees field, be sure to only include the contacts that you intend to add/remove. Also, the contact must already be in the invitees field. The value should be an array of objects with only the "pk" key.
+Token authentication required. When updating the invitees/attendees/options/games field, be sure to only include the contacts/games that you intend to add/remove. The value should be an array of objects with only the pk key-value pairs. In order to add a game to the games field, it must be in the options field. In order to add a contact to the attendees field, it must be in the invitees field.
 
 ### Request
 
