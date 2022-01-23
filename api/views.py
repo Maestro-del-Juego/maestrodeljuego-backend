@@ -1,13 +1,15 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Game, GameNight, Tag, Category, Contact, GeneralFeedback, GameFeedback 
-from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingCreateSerializer, VotingSerializer, GameNightCreateSerializer, GeneralFeedbackSerializer, GameFeedbackSerializer
+from .models import Game, GameNight, Tag, Category, Contact, GeneralFeedback, GameFeedback, RSVP
+from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingCreateSerializer, VotingSerializer, GameNightCreateSerializer, GeneralFeedbackSerializer, GameFeedbackSerializer, RSVPSerializer
 from .permissions import IsAuthorOrReadOnly
 import requests, json, xmltodict, decimal, string, random
 from datetime import date
 from rest_framework import status
 from rest_framework.response import Response
+
+from api import serializers
 
 
 class LibraryView(ListAPIView):
@@ -306,6 +308,13 @@ class GameFeedbackView(CreateAPIView):
     #     return queryset
 
 
+class RSVPListCreateView(ListCreateAPIView):
+    serializer_class = RSVPSerializer
 
+    def get_queryset(self):
+        gamenight_rid = self.kwargs['rid']
+        gamenight = GameNight.objects.get(rid=gamenight_rid)
+        queryset = gamenight.rsvps.all()
+        return queryset
 
 
