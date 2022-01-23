@@ -234,3 +234,9 @@ class Game(models.Model):
             total += ballot.rating
         average = total/len(ballots)
         return round(average, 2)
+
+
+class RSVP(models.Model):
+    gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='rsvps')
+    invitee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='rsvps')
+    attending = models.BooleanField()
