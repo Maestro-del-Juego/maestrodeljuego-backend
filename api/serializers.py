@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, Feedback
+from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, GeneralFeedback, GameFeedback
 from djoser.serializers import UserCreatePasswordRetypeSerializer
-
+from drf_writable_nested import WritableNestedModelSerializer, UniqueFieldsMixin, NestedCreateMixin
 
 class GameListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -113,6 +113,8 @@ class GameNightSerializer(serializers.ModelSerializer):
             'location',
             'options'
         )
+        
+
 
 
 class GameNightCreateSerializer(serializers.ModelSerializer):
@@ -169,7 +171,7 @@ class TagListSerializer(serializers.ModelSerializer):
             'name',
             'user',
         )
-
+        
 
 class VotingSerializer(serializers.ModelSerializer):
     gamenight = serializers.StringRelatedField(read_only=True)
@@ -183,22 +185,49 @@ class VotingSerializer(serializers.ModelSerializer):
             'vote'
         )
 
-
-#CONFUSED HOW GAMEFEEDBACK MODEL FITS IN HERE
-class FeedbackSerializer(serializers.ModelSerializer):
+class GameFeedbackSerializer(serializers.ModelSerializer):
+    # gamenight = serializers.StringRelatedField(read_only=True)
+    # attendee = ContactSerializer()
 
     class Meta:
-        model = Feedback
+        model = GameFeedback
+        fields = (
+            'gamenight',
+            'attendee',
+            'game',
+            'rating',
+        )
+
+
+class GeneralFeedbackSerializer(serializers.ModelSerializer):
+    games = GameFeedbackSerializer(many=True)
+    # gamenight = serializers.StringRelatedField(read_only=True)
+    # attendee = ContactSerializer()
+
+    class Meta:
+        model = GeneralFeedback
         fields = (
             'gamenight',
             'attendee',
             'overall_rating',
             'people_rating',
             'location_rating',
+            'games',
         )
+        read_only_fields = ['games']
+
+        def create(self, validated_data):
+            generalfeedback = GeneralFeedback.objects.create(**validated_data)
+            games = validated_data.pop('games')
+
+            for game in games:
+                GameFeedback.objects.create(**game, generalfeedback=generalfeedback)
+                return generalfeedback
+
 
 
 class VotingCreateSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Voting
         fields = (
