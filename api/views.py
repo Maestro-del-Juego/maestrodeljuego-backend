@@ -317,4 +317,14 @@ class RSVPListCreateView(ListCreateAPIView):
         queryset = gamenight.rsvps.all()
         return queryset
 
+    def perform_create(self, serializer):
+        invitee = self.request.data['invitee']
+        contact = Contact.objects.get(
+            first_name=invitee['first_name'],
+            last_name=invitee['last_name'],
+            email=invitee['email']
+        )
+        gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
+        serializer.save(gamenight=gamenight, invitee=contact)
+
 
