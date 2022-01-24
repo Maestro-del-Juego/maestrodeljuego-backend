@@ -90,7 +90,7 @@ class RSVPSerializer(serializers.ModelSerializer):
 
 class GameForGameNightSerializer(serializers.ModelSerializer):
     votes = serializers.SerializerMethodField()
-    # feedback = serializers.SerializerMethodField()
+    feedback = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
@@ -101,7 +101,7 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
             'pub_year',
             'image',
             'votes',
-            # 'feedback',
+            'feedback',
         )
 
     def get_votes(self, obj):
@@ -112,13 +112,13 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
         votes = obj.tally_votes(gamenight)
         return votes
 
-    # def get_feedback(self, obj):
-    #     serialized_instance = self.parent.parent.instance
-    #     if isinstance(serialized_instance, QuerySet):
-    #         return None
-    #     gamenight = serialized_instance
-    #     rating = obj.calc_feedback(gamenight)
-    #     return rating
+    def get_feedback(self, obj):
+        serialized_instance = self.parent.parent.instance
+        if isinstance(serialized_instance, QuerySet):
+            return None
+        gamenight = serialized_instance
+        rating = obj.calc_feedback(gamenight)
+        return rating
 
 
 class GameNightSerializer(serializers.ModelSerializer):
