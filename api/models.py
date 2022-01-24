@@ -229,6 +229,8 @@ class Game(models.Model):
 
     def calc_feedback(self, gamenight):
         ballots = GameFeedback.objects.filter(game=self, gamenight=gamenight)
+        if len(ballots) == 0:
+            return None
         total = 0
         for ballot in ballots:
             total += ballot.rating
