@@ -39,10 +39,10 @@ class GameNight(models.Model):
     options = models.ManyToManyField('Game', related_name='options', blank=True)
 
     def __repr__(self):
-        return f"<GameNight date:{self.date}>"
+        return f"<GameNight rid:{self.rid}>"
 
     def __str__(self):
-        return f"{self.date}"
+        return f"{self.rid}"
 
     def update_attendees(self, contact_pk):
         attendees_list = self.attendees
