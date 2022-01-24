@@ -78,7 +78,7 @@ def new_game(bgg):
     Takes a BGG ID and returns the associated game object.
     '''
 
-    url = f"https://www.boardgamegeek.com/xmlapi2/thing?id={bgg}&stats=1"
+    url = f"https://boardgamegeek.com/xmlapi2/thing?id={bgg}&stats=1"
 
     game_dict = xml_to_dict(url)
 
