@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, GeneralFeedback, GameFeedback, RSVP
 from djoser.serializers import UserCreatePasswordRetypeSerializer
-from drf_writable_nested import WritableNestedModelSerializer, UniqueFieldsMixin, NestedCreateMixin
+from drf_writable_nested import WritableNestedModelSerializer
 from django.db.models.query import QuerySet
 
 
@@ -217,22 +217,20 @@ class VotingSerializer(serializers.ModelSerializer):
             'vote'
         )
 
+
+#I think we need seperate writing serializers and a single GETting nested serializer
 class GameFeedbackSerializer(serializers.ModelSerializer):
-    # gamenight = serializers.StringRelatedField(read_only=True)
-    # attendee = ContactSerializer()
 
     class Meta:
         model = GameFeedback
         fields = (
-            'gamenight',
-            'attendee',
+            'generalfeedback',
             'game',
             'rating',
         )
 
 
 class GeneralFeedbackSerializer(serializers.ModelSerializer):
-    games = GameFeedbackSerializer(many=True)
     # gamenight = serializers.StringRelatedField(read_only=True)
     # attendee = ContactSerializer()
 
@@ -244,17 +242,8 @@ class GeneralFeedbackSerializer(serializers.ModelSerializer):
             'overall_rating',
             'people_rating',
             'location_rating',
-            'games',
         )
-        read_only_fields = ['games']
 
-        def create(self, validated_data):
-            generalfeedback = GeneralFeedback.objects.create(**validated_data)
-            games = validated_data.pop('games')
-
-            for game in games:
-                GameFeedback.objects.create(**game, generalfeedback=generalfeedback)
-                return generalfeedback
 
 
 
