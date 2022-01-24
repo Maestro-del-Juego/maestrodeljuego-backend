@@ -127,6 +127,7 @@ class GameNightSerializer(serializers.ModelSerializer):
     attendees = ContactSerializer(many=True)
     games = GameListSerializer(read_only=True, many=True)
     options = GameForGameNightSerializer(read_only=True, many=True)
+    feedback = serializers.SerializerMethodField()
 
     class Meta:
         model = GameNight
@@ -142,9 +143,12 @@ class GameNightSerializer(serializers.ModelSerializer):
             'start_time',
             'end_time',
             'location',
-            'options'
+            'options',
+            'feedback',
         )
-        
+
+    def get_feedback(self, obj):
+        return obj.calc_feedback()
 
 
 
