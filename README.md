@@ -561,3 +561,38 @@ POST /gamenight/jcNexbI53C5Ij0X/voting/
 	}
 ]
 ```
+
+
+## RSVP for GameNight
+
+Recommended that email field for "invitee" should come from user input as confirmation. "Attending" field should be either "True" or "False".
+
+### Request
+
+```json
+POST /gamenight/jcNexbI53C5Ij0X/RSVP/
+{
+	"invitee": {
+		"first_name": "Mickey",
+		"last_name": "Mouse",
+		"email": "none@example.com"
+	},
+	"attending": "True"
+}
+```
+
+### Response
+```json
+201 Created
+{
+	"pk": 9,
+	"gamenight": "jcNexbI53C5Ij0X",
+	"invitee": {
+		"pk": 1,
+		"first_name": "Mickey",
+		"last_name": "Mouse",
+		"email": "none@example.com"
+	},
+	"attending": true
+}
+```

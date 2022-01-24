@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, GeneralFeedback, GameFeedback
+from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, GeneralFeedback, GameFeedback, RSVP
 from djoser.serializers import UserCreatePasswordRetypeSerializer
 from drf_writable_nested import WritableNestedModelSerializer, UniqueFieldsMixin, NestedCreateMixin
 from django.db.models.query import QuerySet
@@ -72,6 +72,19 @@ class ContactSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'email'
+        )
+
+
+class RSVPSerializer(serializers.ModelSerializer):
+    gamenight = serializers.StringRelatedField()
+    invitee = ContactSerializer(read_only=True)
+    class Meta:
+        model = RSVP
+        fields = (
+            'pk',
+            'gamenight',
+            'invitee',
+            'attending',
         )
 
 
