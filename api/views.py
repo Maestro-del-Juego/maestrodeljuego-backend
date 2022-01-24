@@ -288,24 +288,32 @@ class ContactUpdateView(RetrieveUpdateDestroyAPIView):
 
 class GeneralFeedbackView(CreateAPIView):
     serializer_class = GeneralFeedbackSerializer
-    queryset = GeneralFeedback.objects.all()
-
-    # def get_queryset(self):
-    #     gamenight_rid = self.kwargs['rid']
-    #     gamenight = GeneralFeedback.objects.get(rid=gamenight_rid)
-    #     queryset = gamenight.feedback.all()
-    #     return queryset
+#queryset is same as VotingView
+    def get_queryset(self):
+        gamenight_rid = self.kwargs['rid']
+        gamenight = GameNight.objects.get(rid=gamenight_rid)
+        queryset = gamenight.generalfeedback.all()
+        return queryset
 
 
 class GameFeedbackView(CreateAPIView):
     serializer_class = GameFeedbackSerializer
-    queryset = GameFeedback.objects.all()
+
+    def get_queryset(self):
+        gamenight_rid = self.kwargs['rid']
+        gamenight = GameNight.objects.get(rid=gamenight_rid)
+        queryset = gamenight.gamefeedback.all()
+        return queryset
+        
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
     
-    # def get_queryset(self):
-    #     gamenight_rid = self.kwargs['rid']
-    #     gamenight = GameFeedback.objects.get(rid=gamenight_rid)
-    #     queryset = gamenight.feedback.all()
-    #     return queryset
 
 
 class RSVPListCreateView(ListCreateAPIView):

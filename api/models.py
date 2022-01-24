@@ -176,14 +176,15 @@ class GameFeedback(models.Model):
     
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['generalfeedback', 'game'], name='unique-game-feedback')
+            models.UniqueConstraint(fields=['gamenight', 'attendee', 'game'], name='unique-game-feedback')
         ]
-    generalfeedback = models.ForeignKey('GeneralFeedback', on_delete=models.CASCADE, related_name='gamefeedback', null=True)
+    gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='gamefeedback', null=True)
+    attendee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='gamefeedback', null=True)
     game = models.ForeignKey('Game', on_delete=models.CASCADE, related_name='gamefeedback')
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
 
     def __repr__(self):
-        return f"<Game feedback:{self.feedback}>"
+        return f"<GameFeedback {self.game.title} by {self.feedback.attendee.first_name} {self.feedback.attendee.last_name}>"
 
     def __str__(self):
         return {self.feedback}
