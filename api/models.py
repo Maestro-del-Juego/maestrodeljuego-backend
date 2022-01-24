@@ -82,6 +82,20 @@ class GameNight(models.Model):
             else:
                 games_list.add(game)
 
+    def calc_feedback(self):
+        feedbacks = GeneralFeedback.objects.filter(gamenight=self)
+        if len(feedbacks) == 0:
+            return None
+        overall_total, people_total, location_total = 0, 0, 0
+        for feedback in feedbacks:
+            overall_total += feedback.overall_rating
+            people_total += feedback.people_rating
+            location_total += feedback.location_rating
+        overall_avg = round(overall_total/len(feedbacks), 2)
+        people_avg = round(people_total/len(feedbacks), 2)
+        location_avg = round(location_total/len(feedbacks), 2)
+        return {'overall': overall_avg, 'people': people_avg, 'location': location_avg}
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=150)
@@ -229,6 +243,8 @@ class Game(models.Model):
 
     def calc_feedback(self, gamenight):
         ballots = GameFeedback.objects.filter(game=self, gamenight=gamenight)
+        if len(ballots) == 0:
+            return None
         total = 0
         for ballot in ballots:
             total += ballot.rating
