@@ -222,21 +222,18 @@ class VotingSerializer(serializers.ModelSerializer):
         )
 
 
-#I think we need seperate writing serializers and a single GETting nested serializer
 class GameFeedbackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GameFeedback
         fields = (
-            'generalfeedback',
+            'gamenight',
+            'attendee',
             'game',
             'rating',
         )
 
-
 class GeneralFeedbackSerializer(serializers.ModelSerializer):
-    # gamenight = serializers.StringRelatedField(read_only=True)
-    # attendee = ContactSerializer()
 
     class Meta:
         model = GeneralFeedback
@@ -247,7 +244,6 @@ class GeneralFeedbackSerializer(serializers.ModelSerializer):
             'people_rating',
             'location_rating',
         )
-
 
 
 

@@ -292,17 +292,23 @@ class GeneralFeedbackView(CreateAPIView):
     def get_queryset(self):
         gamenight_rid = self.kwargs['rid']
         gamenight = GameNight.objects.get(rid=gamenight_rid)
-        queryset = gamenight.feedback.all()
+        queryset = gamenight.generalfeedback.all()
         return queryset
 
 
 class GameFeedbackView(CreateAPIView):
     serializer_class = GameFeedbackSerializer
-    def get_queryset(self):
-        generalfeedback = GeneralFeedback.objects.all()
-        queryset = GameFeedback.objects.filter(generalfeedback=generalfeedback.id)
-        return queryset
+    # def get_queryset(self):
+    #     generalfeedback = GeneralFeedback.objects.all()
+    #     queryset = GameFeedback.objects.filter(generalfeedback=generalfeedback.id)
+    #     return queryset
         
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
     
