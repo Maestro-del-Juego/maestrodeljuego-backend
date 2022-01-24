@@ -27,17 +27,6 @@ class UserNestedSerializer(serializers.ModelSerializer):
         )
 
 
-class RSVPSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RSVP
-        fields = (
-            'pk',
-            'gamenight',
-            'invitee',
-            'attending',
-        )
-
-
 class GameDetailSerializer(serializers.ModelSerializer):
     owned = serializers.SerializerMethodField()
     wishlisted = serializers.SerializerMethodField()
@@ -83,6 +72,19 @@ class ContactSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'email'
+        )
+
+
+class RSVPSerializer(serializers.ModelSerializer):
+    gamenight = serializers.StringRelatedField()
+    invitee = ContactSerializer(read_only=True)
+    class Meta:
+        model = RSVP
+        fields = (
+            'pk',
+            'gamenight',
+            'invitee',
+            'attending',
         )
 
 
