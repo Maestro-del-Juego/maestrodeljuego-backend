@@ -210,18 +210,6 @@ class TagListSerializer(serializers.ModelSerializer):
         )
         
 
-class VotingSerializer(serializers.ModelSerializer):
-    gamenight = serializers.StringRelatedField(read_only=True)
-    invitee = ContactSerializer()
-    class Meta:
-        model = Voting
-        fields = (
-            'gamenight',
-            'invitee',
-            'game',
-            'vote'
-        )
-
 
 class GameFeedbackSerializer(serializers.ModelSerializer):
 
@@ -248,7 +236,7 @@ class GeneralFeedbackSerializer(serializers.ModelSerializer):
 
 
 
-class VotingCreateSerializer(serializers.ModelSerializer):
+class VotingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Voting
