@@ -88,6 +88,16 @@ class RSVPSerializer(serializers.ModelSerializer):
         )
 
 
+class RSVPForGameNightSerializer(serializers.ModelSerializer):
+    invitee = serializers.StringRelatedField()
+    class Meta:
+        model = RSVP
+        fields = (
+            'invitee',
+            'attending'
+        )
+
+
 class GameForGameNightSerializer(serializers.ModelSerializer):
     votes = serializers.SerializerMethodField()
     # feedback = serializers.SerializerMethodField()
@@ -125,6 +135,7 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
 class GameNightSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer(read_only=True)
     invitees = ContactSerializer(many=True)
+    rsvps = RSVPForGameNightSerializer(many=True)
     attendees = ContactSerializer(many=True)
     games = GameListSerializer(read_only=True, many=True)
     options = GameForGameNightSerializer(read_only=True, many=True)
@@ -139,6 +150,7 @@ class GameNightSerializer(serializers.ModelSerializer):
             'date',
             'status',
             'invitees',
+            'rsvps',
             'attendees',
             'games',
             'start_time',
