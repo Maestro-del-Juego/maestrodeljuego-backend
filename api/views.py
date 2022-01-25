@@ -335,11 +335,25 @@ class GameFeedbackView(CreateAPIView):
         queryset = gamenight.gamefeedback.all()
         return queryset
 
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        data = self.request.data
+        data_copy = data.copy()
+        gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
+        contact = Contact.objects.get(pk=data[0]['attendee'])
+        for feedback in data_copy:
+            game = Game.objects.get(pk=feedback['game'])
+            if GameFeedback.objects.filter(gamenight=gamenight, attendee=contact, game=game).exists():
+                data_copy.remove(feedback)
+        kwargs['data'] = data_copy
+        return serializer_class(*args, **kwargs)
+
     def perform_create(self, serializer):
-        attendee_pk = self.request.data['attendee']
+        attendee_pk = self.request.data[0]['attendee']
         contact = Contact.objects.get(pk=attendee_pk)
         gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
-        if not GeneralFeedback.objects.filter(gamenight=gamenight, attendee=contact).exists():
+        if not GameFeedback.objects.filter(gamenight=gamenight, attendee=contact).exists():
             serializer.save(gamenight=gamenight, attendee=contact)
             return True
         return False
