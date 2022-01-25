@@ -175,10 +175,11 @@ class GameNightCreateSerializer(serializers.ModelSerializer):
 
 
 class UserStatsSerializer(serializers.Serializer):
-
+    weekday_stats = serializers.SerializerMethodField()
 
     def build_week_dict(self):
-        user = CustomUser()
+        # this line will probably need bugfixing, but I think this is the solution
+        user = self.parent.instance
         gamenights = user.gamenights.all()
         game_days = {}
         days = list(day_name)
@@ -188,6 +189,10 @@ class UserStatsSerializer(serializers.Serializer):
             day = night.date.weekday()
             game_days[days[day]].append(night.date)
         return game_days
+
+    def get_weekday_stats(self):
+        days_dict = self.build_week_dict()
+
 
 
 class DjoserUserSerializer(serializers.ModelSerializer):
