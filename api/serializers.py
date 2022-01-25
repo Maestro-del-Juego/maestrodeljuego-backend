@@ -202,7 +202,7 @@ class UserStatsSerializer(serializers.Serializer):
         '''
         # this line will probably need bugfixing, but I think this is the solution
         user = self.parent.instance
-        gamenights = user.gamenights.all()
+        gamenights = user.gamenights.filter(status="Finalized")
         game_days = {}
         days = list(day_name)
         for day in days:
@@ -231,7 +231,7 @@ class UserStatsSerializer(serializers.Serializer):
             stats_dict['avg_session_length'][day] = self.days_avg_session_len(gamenights)
             stats_dict['avg_game_num'][day] = self.days_avg_game_num(gamenights)
             stats_dict['avg_player_num'][day] = self.days_avg_player_num(gamenights)
-            stats_dict['sessions_num'][day] = self.days_sessions_num(gamenights)
+            stats_dict['sessions_num'][day] = len(gamenights)
 
 
     def days_avg_overall(self, gamenights):
@@ -255,10 +255,16 @@ class UserStatsSerializer(serializers.Serializer):
 
     def days_avg_attend(self, gamenights):
         '''
-        Takes a list of GameNight objects and returns the average attendence
+        Takes a list of GameNight objects and returns the average attendance
         ratio among them.
         '''
-        pass
+        gamenight_num = len(gamenights)
+        total = 0
+        for gamenight in gamenights:
+            attendance = gamenight.calc_attendance_ratio()
+            total += attendance
+        average = round(total/gamenight_num, 2)
+        return average
 
     def days_avg_session_len(self, gamenights):
         '''
@@ -280,18 +286,6 @@ class UserStatsSerializer(serializers.Serializer):
         players among them.
         '''
         pass
-
-    def days_sessions_num(self, gamenights):
-        '''
-        Takes a list of GameNight objects and returns the total number of
-        game night sessions.
-        '''
-        pass
-
-
-
-
-
 
 
 class DjoserUserSerializer(serializers.ModelSerializer):
