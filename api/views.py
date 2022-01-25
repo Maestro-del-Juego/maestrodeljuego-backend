@@ -1,5 +1,9 @@
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
+from django.views.generic import FormView
+from .forms import ContactForm
+from django.urls import reverse_lazy
+# NOT SURE WHAT reverse_lazy does or if we need it
 from django.core.exceptions import BadRequest
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -360,3 +364,11 @@ class RSVPListCreateView(ListCreateAPIView):
         return Response(not_saved, status=status.HTTP_418_IM_A_TEAPOT, headers=headers)
 
 
+# #BELOW IS FUNCTION BASED VIEW.  INSERT LINES STARTING W/ form = ContactForm.... INTO CORRECT FUNCTIONS?
+# if request.method == 'POST':
+#     form = ContactForm(request.POST)
+#     if form.is_valid():
+#         form.send()
+#         return redirect('contact:success')
+# else:
+#     form = ContactForm())
