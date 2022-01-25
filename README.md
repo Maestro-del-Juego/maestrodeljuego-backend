@@ -596,3 +596,59 @@ POST /gamenight/jcNexbI53C5Ij0X/RSVP/
 	"attending": true
 }
 ```
+
+
+## Leave General Feedback for GameNight
+
+Required fields are "attendee" and "overall_rating". All others are optional.
+
+### Request
+```json
+POST /gamenight/jcNexbI53C5Ij0X/feedback/
+{
+	"attendee": 2,
+	"overall_rating": 4
+}
+```
+
+### Response
+'''json
+201 Created
+{
+	"gamenight": 5,
+	"attendee": 2,
+	"overall_rating": 4,
+	"people_rating": null,
+	"location_rating": null,
+	"comments": null
+}
+
+
+## Leave Game Feedback for GameNight
+
+Attendee is the only required field. All others are optional. Request should be an array of JSON objects, one for each game in the GameNight's "games" field.
+
+### Request
+```json
+POST /gamenight/jcNexbI53C5Ij0X/gamefeedback/
+[
+	{
+		"attendee": 1,
+		"game": 4,
+		"rating": 4
+	}
+]
+```
+
+### Response
+```json
+201 Created
+[
+	{
+		"gamenight": 5,
+		"attendee": 1,
+		"game": 4,
+		"rating": 4
+	}
+]
+```
