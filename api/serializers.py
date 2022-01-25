@@ -190,6 +190,10 @@ class UserStatsSerializer(serializers.Serializer):
     weekday_stats = serializers.SerializerMethodField()
 
     def build_week_dict(self):
+        '''
+        Builds a dictionary where the keys are the names for the days of the
+        week and the values are the GameNights that occurred on that day.
+        '''
         # this line will probably need bugfixing, but I think this is the solution
         user = self.parent.instance
         gamenights = user.gamenights.all()
@@ -199,19 +203,42 @@ class UserStatsSerializer(serializers.Serializer):
             game_days[day] = []
         for night in gamenights:
             day = night.date.weekday()
-            game_days[days[day]].append(night.date)
+            game_days[days[day]].append(night)
         return game_days
 
     def get_weekday_stats(self):
+
         days_dict = self.build_week_dict()
+        days = days_dict.keys()
         stats_dict = {
-            'avg_feedback': {},
+            'avg_overall_feedback': {},
             'attend_ratio': {},
-            'session_length': {},
-            'game_num': {},
-            'people_num': {},
+            'avg_session_length': {},
+            'avg_game_num': {},
+            'avg_people_num': {},
             'sessions_num': {}
         }
+        stat_cats = stats_dict.keys()
+        for stat in stat_cats:
+            for day in days:
+                total = 0
+                gamenights = days_dict[day]
+                gamenight_num = len(gamenights)
+                for gamenight in gamenights:
+                    overall = gamenight.calc_avg_overall()
+                    if overall == None:
+                        gamenight_num -= 1
+                        continue
+                    total += overall
+                if gamenight_num == 0:
+                    average = None
+                else:
+                    average = total/gamenight_num
+                stat_cats[stat][day] = average
+
+
+
+
 
 
 
@@ -220,6 +247,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     wishlist = GameListSerializer(many=True, read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
     gamenights = GameNightSerializer(many=True, read_only=True)
+    statistics = UserStatsSerializer()
     class Meta:
         model = CustomUser
         fields = (
@@ -231,6 +259,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'wishlist',
             'contacts',
             'gamenights',
+            'statistics',
         )
 
 
