@@ -344,6 +344,19 @@ class RSVPListCreateView(ListCreateAPIView):
             email=invitee['email']
         )
         gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
-        serializer.save(gamenight=gamenight, invitee=contact)
+        if not RSVP.objects.filter(gamenight=gamenight, invitee=contact).exists():
+            serializer.save(gamenight=gamenight, invitee=contact)
+            return True
+        return False
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        saved = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        if saved:
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        not_saved = {'detail': 'Invitee has already RSVPed.'}
+        return Response(not_saved, status=status.HTTP_418_IM_A_TEAPOT, headers=headers)
 
 
