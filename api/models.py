@@ -124,7 +124,7 @@ class GeneralFeedback(models.Model):
             models.UniqueConstraint(fields=['gamenight', 'attendee'], name='unique-feedback')
         ]
 
-    gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='generalfeedback')
+    gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='generalfeedback', null=True)
     attendee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='generalfeedback')
     overall_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     people_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
