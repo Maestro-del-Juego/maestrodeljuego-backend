@@ -152,7 +152,6 @@ class GameNightSerializer(serializers.ModelSerializer):
         return obj.calc_feedback()
 
 
-
 class GameNightCreateSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer(read_only=True)
 
@@ -201,6 +200,7 @@ class DjoserRegistrationSerializer(UserCreatePasswordRetypeSerializer):
             'password',
         )
 
+
 class TagListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
@@ -234,6 +234,7 @@ class GameFeedbackSerializer(serializers.ModelSerializer):
             'rating',
         )
 
+
 class GeneralFeedbackSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -245,7 +246,6 @@ class GeneralFeedbackSerializer(serializers.ModelSerializer):
             'people_rating',
             'location_rating',
         )
-
 
 
 class VotingCreateSerializer(serializers.ModelSerializer):
