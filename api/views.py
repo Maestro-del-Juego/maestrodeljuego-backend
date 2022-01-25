@@ -299,12 +299,31 @@ class ContactUpdateView(RetrieveUpdateDestroyAPIView):
 
 class GeneralFeedbackView(CreateAPIView):
     serializer_class = GeneralFeedbackSerializer
-#queryset is same as VotingView
+
     def get_queryset(self):
         gamenight_rid = self.kwargs['rid']
         gamenight = GameNight.objects.get(rid=gamenight_rid)
         queryset = gamenight.generalfeedback.all()
         return queryset
+
+    def perform_create(self, serializer):
+        attendee_pk = self.request.data['attendee']
+        contact = Contact.objects.get(pk=attendee_pk)
+        gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
+        if not GeneralFeedback.objects.filter(gamenight=gamenight, attendee=contact).exists():
+            serializer.save(gamenight=gamenight, attendee=contact)
+            return True
+        return False
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        saved = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        if saved:
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        not_saved = {'detail': 'Attendee has already left feedback.'}
+        return Response(not_saved, status=status.HTTP_418_IM_A_TEAPOT, headers=headers)
 
 
 class GameFeedbackView(CreateAPIView):
@@ -315,13 +334,25 @@ class GameFeedbackView(CreateAPIView):
         gamenight = GameNight.objects.get(rid=gamenight_rid)
         queryset = gamenight.gamefeedback.all()
         return queryset
-        
+
+    def perform_create(self, serializer):
+        attendee_pk = self.request.data['attendee']
+        contact = Contact.objects.get(pk=attendee_pk)
+        gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
+        if not GeneralFeedback.objects.filter(gamenight=gamenight, attendee=contact).exists():
+            serializer.save(gamenight=gamenight, attendee=contact)
+            return True
+        return False
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        saved = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        if saved:
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        not_saved = {'detail': 'Attendee has already left feedback.'}
+        return Response(not_saved, status=status.HTTP_418_IM_A_TEAPOT, headers=headers)
 
 
     
