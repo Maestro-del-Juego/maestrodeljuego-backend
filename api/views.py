@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
+from django.core.exceptions import BadRequest
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Game, GameNight, Tag, Category, Contact, GeneralFeedback, GameFeedback, RSVP
-from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingCreateSerializer, VotingSerializer, GameNightCreateSerializer, GeneralFeedbackSerializer, GameFeedbackSerializer, RSVPSerializer
+from .models import Game, GameNight, Tag, Category, Contact, Voting, GeneralFeedback, GameFeedback, RSVP
+from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingSerializer, GameNightCreateSerializer, GeneralFeedbackSerializer, GameFeedbackSerializer, RSVPSerializer
 from .permissions import IsAuthorOrReadOnly
 import requests, json, xmltodict, decimal, string, random
 from datetime import date
@@ -265,10 +266,19 @@ class VotingView(CreateAPIView):
         queryset = gamenight.voting.all()
         return queryset
 
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return VotingCreateSerializer
-        return super().get_serializer_class()
+    def get_serializer(self, *args, **kwargs):
+        serializer_class = self.get_serializer_class()
+        kwargs.setdefault('context', self.get_serializer_context())
+        data = self.request.data
+        data_copy = data.copy()
+        gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
+        invitee = Contact.objects.get(pk=data[0]['invitee'])
+        for vote in data_copy:
+            game = Game.objects.get(pk=vote['game'])
+            if Voting.objects.filter(gamenight=gamenight, invitee=invitee, game=game).exists():
+                data_copy.remove(vote)
+        kwargs['data'] = data_copy
+        return serializer_class(*args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, many=True)
