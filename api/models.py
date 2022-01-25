@@ -96,6 +96,16 @@ class GameNight(models.Model):
         location_avg = round(location_total/len(feedbacks), 2)
         return {'overall': overall_avg, 'people': people_avg, 'location': location_avg}
 
+    def calc_avg_overall(self):
+        feedbacks = self.generalfeedback.all()
+        if len(feedbacks) == 0:
+            return None
+        total = 0
+        for feedback in feedbacks:
+            total += feedback.overall_rating
+        overall_avg = round(total/len(feedbacks), 2)
+        return overall_avg
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=150)
