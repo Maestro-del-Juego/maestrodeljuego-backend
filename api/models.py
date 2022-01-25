@@ -128,7 +128,7 @@ class GeneralFeedback(models.Model):
     attendee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='generalfeedback')
     overall_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     people_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True, null=True)
-    location_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True, null=True),
+    location_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True, null=True)
     comments = models.TextField(blank=True, null=True)
 
     def __repr__(self):
