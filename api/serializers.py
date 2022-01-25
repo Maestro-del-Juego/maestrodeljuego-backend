@@ -8,6 +8,8 @@ from datetime import date
 
 
 class GameListSerializer(serializers.ModelSerializer):
+    categories = serializers.StringRelatedField(many=True)
+
     class Meta:
         model = Game
         fields = (
@@ -16,6 +18,10 @@ class GameListSerializer(serializers.ModelSerializer):
             'title',
             'pub_year',
             'image',
+            'playtime',
+            'min_players',
+            'max_players',
+            'categories',
         )
 
 
