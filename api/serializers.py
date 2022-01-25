@@ -245,6 +245,7 @@ class GeneralFeedbackSerializer(serializers.ModelSerializer):
             'overall_rating',
             'people_rating',
             'location_rating',
+            'comments',
         )
 
 
