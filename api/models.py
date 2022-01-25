@@ -256,6 +256,11 @@ class Game(models.Model):
 
 
 class RSVP(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['gamenight', 'invitee'], name='unique-rsvp')
+        ]
+
     gamenight = models.ForeignKey('GameNight', on_delete=models.CASCADE, related_name='rsvps')
     invitee = models.ForeignKey('Contact', on_delete=models.CASCADE, related_name='rsvps')
     attending = models.BooleanField()
