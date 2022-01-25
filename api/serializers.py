@@ -204,6 +204,14 @@ class UserStatsSerializer(serializers.Serializer):
 
     def get_weekday_stats(self):
         days_dict = self.build_week_dict()
+        stats_dict = {
+            'avg_feedback': {},
+            'attend_ratio': {},
+            'session_length': {},
+            'game_num': {},
+            'people_num': {},
+            'sessions_num': {}
+        }
 
 
 
