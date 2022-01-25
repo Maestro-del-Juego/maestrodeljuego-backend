@@ -3,6 +3,8 @@ from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, GeneralFe
 from djoser.serializers import UserCreatePasswordRetypeSerializer
 from drf_writable_nested import WritableNestedModelSerializer
 from django.db.models.query import QuerySet
+from calendar import day_name
+from datetime import date
 
 
 class GameListSerializer(serializers.ModelSerializer):
@@ -170,6 +172,22 @@ class GameNightCreateSerializer(serializers.ModelSerializer):
             'location',
             'options'
         )
+
+
+class UserStatsSerializer(serializers.Serializer):
+
+
+    def build_week_dict(self):
+        user = CustomUser()
+        gamenights = user.gamenights.all()
+        game_days = {}
+        days = list(day_name)
+        for day in days:
+            game_days[day] = []
+        for night in gamenights:
+            day = night.date.weekday()
+            game_days[days[day]].append(night.date)
+        return game_days
 
 
 class DjoserUserSerializer(serializers.ModelSerializer):
