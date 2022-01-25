@@ -218,29 +218,75 @@ class UserStatsSerializer(serializers.Serializer):
         days = days_dict.keys()
         stats_dict = {
             'avg_overall_feedback': {},
-            'attend_ratio': {},
-            'avg_session_length': {},
+            'avg_attend_ratio': {},
+            'avg_session_len': {},
             'avg_game_num': {},
-            'avg_people_num': {},
+            'avg_player_num': {},
             'sessions_num': {}
         }
-        stat_cats = stats_dict.keys()
-        for stat in stat_cats:
-            for day in days:
-                total = 0
-                gamenights = days_dict[day]
-                gamenight_num = len(gamenights)
-                for gamenight in gamenights:
-                    overall = gamenight.calc_avg_overall()
-                    if overall == None:
-                        gamenight_num -= 1
-                        continue
-                    total += overall
-                if gamenight_num == 0:
-                    average = None
-                else:
-                    average = total/gamenight_num
-                stat_cats[stat][day] = average
+        for day in days:
+            gamenights = days_dict[day]
+            stats_dict['avg_overall_feedback'][day] = self.days_avg_overall(gamenights)
+            stats_dict['avg_attend_ratio'][day] = self.days_avg_attend(gamenights)
+            stats_dict['avg_session_length'][day] = self.days_avg_session_len(gamenights)
+            stats_dict['avg_game_num'][day] = self.days_avg_game_num(gamenights)
+            stats_dict['avg_player_num'][day] = self.days_avg_player_num(gamenights)
+            stats_dict['sessions_num'][day] = self.days_sessions_num(gamenights)
+
+
+    def days_avg_overall(self, gamenights):
+        '''
+        Takes a list of GameNight objects and returns the average overall
+        rating among them.
+        '''
+        gamenight_num = len(gamenights)
+        total = 0
+        for gamenight in gamenights:
+            overall = gamenight.calc_avg_overall()
+            if overall == None:
+                gamenight_num -= 1
+                continue
+            total += overall
+        if gamenight_num == 0:
+            average = None
+        else:
+            average = round(total/gamenight_num, 2)
+        return average
+
+    def days_avg_attend(self, gamenights):
+        '''
+        Takes a list of GameNight objects and returns the average attendence
+        ratio among them.
+        '''
+        pass
+
+    def days_avg_session_len(self, gamenights):
+        '''
+        Takes a list of GameNight objects and returns the average session
+        length (in minutes) among them.
+        '''
+        pass
+
+    def days_avg_game_num(self, gamenights):
+        '''
+        Takes a list of GameNight objects and returns the average number of
+        unique games played among them.
+        '''
+        pass
+
+    def days_avg_player_num(self, gamenights):
+        '''
+        Takes a list of GameNight objects and returns the average number of
+        players among them.
+        '''
+        pass
+
+    def days_sessions_num(self, gamenights):
+        '''
+        Takes a list of GameNight objects and returns the total number of
+        game night sessions.
+        '''
+        pass
 
 
 
