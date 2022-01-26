@@ -427,6 +427,15 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                 index -= 1
         return return_list
 
+
+    # def get_least_played_games(self, obj):
+    #     return_list = []
+    #     games = obj.games.all()
+    #     freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
+    #     if len(games) < 5:
+    #         for game in games:
+
+
     def sort_games_by_play_num(self, games):
         other_data_dict = {}
         freq_dict = {}
