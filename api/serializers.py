@@ -500,7 +500,18 @@ class DjoserUserSerializer(serializers.ModelSerializer):
         games = obj.games.all()
         freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
         zeroes = [k for k,v in freq_dict.items() if v == 0]
-        return zeroes
+        for game in zeroes:
+            game_data = other_data[game]
+            return_list.append(
+                {
+                    'name': game,
+                    'bgg': game_data['bgg'],
+                    'pub_year': game_data['pub_year'],
+                    'image': game_data['image'],
+                    'played': freq_dict[game]
+                }
+            )
+        return return_list
 
     def sort_games_by_play_num(self, games):
         other_data_dict = {}
