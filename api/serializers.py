@@ -3,9 +3,13 @@ from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, GeneralFe
 from djoser.serializers import UserCreatePasswordRetypeSerializer
 from drf_writable_nested import WritableNestedModelSerializer
 from django.db.models.query import QuerySet
+from calendar import day_name
+from datetime import date
 
 
 class GameListSerializer(serializers.ModelSerializer):
+    categories = serializers.StringRelatedField(many=True)
+
     class Meta:
         model = Game
         fields = (
@@ -14,6 +18,10 @@ class GameListSerializer(serializers.ModelSerializer):
             'title',
             'pub_year',
             'image',
+            'playtime',
+            'min_players',
+            'max_players',
+            'categories',
         )
 
 
@@ -189,6 +197,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     wishlist = GameListSerializer(many=True, read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
     gamenights = GameNightSerializer(many=True, read_only=True)
+    weekday_stats = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         fields = (
@@ -200,7 +209,142 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'wishlist',
             'contacts',
             'gamenights',
+            'weekday_stats',
         )
+
+    def get_weekday_stats(self, obj):
+        user = obj
+        gamenight_dict = self.build_week_dict(user)
+        days = gamenight_dict.keys()
+        stats_dict = {
+            'avg_overall_feedback': {},
+            'avg_attend_ratio': {},
+            'avg_session_len': {},
+            'avg_game_num': {},
+            'avg_player_num': {},
+            'sessions_num': {}
+        }
+        for day in days:
+            gamenights = gamenight_dict[day]
+            stats_dict['avg_overall_feedback'][day] = self.days_avg_overall(gamenights)
+            stats_dict['avg_attend_ratio'][day] = self.days_avg_attend(gamenights)
+            stats_dict['avg_session_len'][day] = self.days_avg_session_len(gamenights)
+            stats_dict['avg_game_num'][day] = self.days_avg_game_num(gamenights)
+            stats_dict['avg_player_num'][day] = self.days_avg_player_num(gamenights)
+            stats_dict['sessions_num'][day] = len(gamenights)
+        return stats_dict
+
+    def build_week_dict(self, user):
+        '''
+        Builds a dictionary where the keys are the names for the days of the
+        week and the values are the GameNights that occurred on that day.
+        '''
+        gamenights = user.gamenights.filter(status="Finalized")
+        game_days = {}
+        days = list(day_name)
+        for day in days:
+            game_days[day] = []
+        for night in gamenights:
+            day = night.date.weekday()
+            game_days[days[day]].append(night)
+        return game_days
+
+    def days_avg_overall(self, gamenights):
+        '''
+        Takes a list of GameNight objects and returns the average overall
+        rating among them.
+        '''
+        gamenight_num = len(gamenights)
+        total = 0
+        for gamenight in gamenights:
+            overall = gamenight.calc_avg_overall()
+            if overall == None:
+                gamenight_num -= 1
+                continue
+            total += overall
+        if gamenight_num == 0:
+            average = None
+        else:
+            average = round(total/gamenight_num, 2)
+        return average
+
+    def days_avg_attend(self, gamenights):
+        '''
+        Takes a list of GameNight objects and returns the average attendance
+        ratio among them.
+        '''
+        gamenight_num = len(gamenights)
+        total = 0
+        for gamenight in gamenights:
+            attendees_num = len(gamenight.attendees.all())
+            invitees_num = len(gamenight.invitees.all())
+            if invitees_num == None:
+                gamenight_num -= 1
+                continue
+            attendance = round(attendees_num/invitees_num, 2)
+            total += attendance
+        if gamenight_num == 0:
+            average = None
+        else:
+            average = round(total/gamenight_num, 2)
+        return average
+
+    def days_avg_session_len(self, gamenights):
+        '''
+        Takes a list of GameNight objects and returns the average session
+        length (in minutes) among them.
+        '''
+        gamenight_num = len(gamenights)
+        total = 0
+        for gamenight in gamenights:
+            session_len = gamenight.calc_session_len()
+            if session_len == None:
+                gamenight_num -= 1
+                continue
+            total += session_len
+        if gamenight_num == 0:
+            average = None
+        else:
+            average = round(total/gamenight_num, 2)
+        return average
+
+    def days_avg_game_num(self, gamenights):
+        '''
+        Takes a list of GameNight objects and returns the average number of
+        unique games played among them.
+        '''
+        gamenight_num = len(gamenights)
+        total = 0
+        for gamenight in gamenights:
+            game_num = len(gamenight.games.all())
+            if game_num == 0:
+                gamenight_num -=1
+                continue
+            total += game_num
+        if gamenight_num == 0:
+            average = None
+        else:
+            average = round(total/gamenight_num, 2)
+        return average
+
+    def days_avg_player_num(self, gamenights):
+        '''
+        Takes a list of GameNight objects and returns the average number of
+        players among them.
+        '''
+        gamenight_num = len(gamenights)
+        total = 0
+        for gamenight in gamenights:
+            player_num = len(gamenight.attendees.all())
+            if player_num ==0:
+                gamenight_num -=1
+                continue
+            total += player_num
+        if gamenight_num == 0:
+            average = None
+        else:
+            average = round(total/gamenight_num, 2)
+        return average
 
 
 class DjoserRegistrationSerializer(UserCreatePasswordRetypeSerializer):

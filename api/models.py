@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.mail import send_mail
 from games import settings
-
+from datetime import datetime, timedelta
 
 
 class CustomUser(AbstractUser):
@@ -110,6 +110,32 @@ class GameNight(models.Model):
         people_avg = round(people_total/len(feedbacks), 2)
         location_avg = round(location_total/len(feedbacks), 2)
         return {'overall': overall_avg, 'people': people_avg, 'location': location_avg}
+
+    def calc_avg_overall(self):
+        feedbacks = self.generalfeedback.all()
+        if len(feedbacks) == 0:
+            return None
+        total = 0
+        for feedback in feedbacks:
+            total += feedback.overall_rating
+        overall_avg = round(total/len(feedbacks), 2)
+        return overall_avg
+
+    def calc_session_len(self):
+        date = self.date
+        t1 = self.start_time
+        t2 = self.end_time
+        if t2 == None:
+            return None
+        d1 = datetime(date.year, date.month, date.day, t1.hour, t1.minute)
+        if t1.hour > t2.hour:
+            diff = timedelta(days=1)
+            dt = datetime(date.year, date.month, date.day, t2.hour, t2.minute)
+            d2 = dt + diff
+        else:
+            d2 = datetime(date.year, date.month, date.day, t2.hour, t2.minute)
+        delta = d2 - d1
+        return delta.total_seconds()/60
 
 
 class Tag(models.Model):
