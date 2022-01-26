@@ -199,6 +199,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     gamenights = GameNightSerializer(many=True, read_only=True)
     weekday_stats = serializers.SerializerMethodField()
     most_common_players = serializers.SerializerMethodField()
+    most_played_games = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         fields = (
@@ -211,7 +212,8 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'contacts',
             'gamenights',
             'weekday_stats',
-            'most_common_players'
+            'most_common_players',
+            'most_played_games',
         )
 
     # methods for weekday_stats field
@@ -373,6 +375,34 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                 name = contacts_sort[index]
                 pk = name_pk_dict[name]
                 return_list.append({'name': name, 'pk': pk, 'attended': freq_dict[name]})
+                index -= 1
+        return return_list
+
+    def get_most_played_games(self, obj):
+        games = obj.games.all()
+        return_list = []
+        other_data_dict = {}
+        freq_dict = {}
+        for game in games:
+            gamenights = len(game.gamenights.all())
+            freq_dict[str(game)] = gamenights
+            other_data_dict[str(game)] = {'bgg': game.bgg, 'pub_year': game.pub_year, 'image': game.image}
+        games_sort = sorted(freq_dict, key=freq_dict.__getitem__)
+        breakpoint()
+        if len(games) < 5:
+            index = -1
+            max = -len(games) - 1
+            while index > max:
+                name = games_sort[index]
+                other_data = other_data_dict[name]
+                return_list.append({'name': name, 'bgg': other_data['bgg'], 'pub_year': other_data['pub_year'], 'image': other_data['image'], 'played': freq_dict[name]})
+                index -= 1
+        else:
+            index = -1
+            while index > -6:
+                name = games_sort[index]
+                other_data = other_data_dict[name]
+                return_list.append({'name': name, 'bgg': other_data['bgg'], 'pub_year': other_data['pub_year'], 'image': other_data['image'], 'played': freq_dict[name]})
                 index -= 1
         return return_list
 
