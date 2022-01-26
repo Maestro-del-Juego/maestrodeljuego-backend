@@ -142,7 +142,7 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
 
 class GameNightSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer(read_only=True)
-    invitees = ContactSerializer(many=True)
+    invitees = serializers.SerializerMethodField()
     rsvps = RSVPForGameNightSerializer(many=True)
     attendees = ContactSerializer(many=True)
     games = GameListSerializer(read_only=True, many=True)
@@ -170,6 +170,26 @@ class GameNightSerializer(serializers.ModelSerializer):
 
     # def get_feedback(self, obj):
     #     return obj.calc_feedback()
+
+    def get_invitees(self, obj):
+        invitees = obj.invitees.all()
+        rsvps = obj.rsvps.all()
+        rsvp_list = []
+        inv_list = []
+        for rsvp in rsvps:
+            rsvp_list.append(rsvp.invitee)
+        for contact in invitees:
+            if contact in rsvp_list:
+                continue
+            inv_list.append(
+                {
+                    'pk': contact.pk,
+                    'first_name': contact.first_name,
+                    'last_name': contact.last_name,
+                    'email': contact.email
+                }
+            )
+        return inv_list
 
 
 class GameNightCreateSerializer(serializers.ModelSerializer):
