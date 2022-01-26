@@ -214,8 +214,8 @@ class UserStatsSerializer(serializers.Serializer):
 
     def get_weekday_stats(self):
 
-        days_dict = self.build_week_dict()
-        days = days_dict.keys()
+        gamenight_dict = self.build_week_dict()
+        days = gamenight_dict.keys()
         stats_dict = {
             'avg_overall_feedback': {},
             'avg_attend_ratio': {},
@@ -225,7 +225,7 @@ class UserStatsSerializer(serializers.Serializer):
             'sessions_num': {}
         }
         for day in days:
-            gamenights = days_dict[day]
+            gamenights = gamenight_dict[day]
             stats_dict['avg_overall_feedback'][day] = self.days_avg_overall(gamenights)
             stats_dict['avg_attend_ratio'][day] = self.days_avg_attend(gamenights)
             stats_dict['avg_session_length'][day] = self.days_avg_session_len(gamenights)
@@ -261,7 +261,9 @@ class UserStatsSerializer(serializers.Serializer):
         gamenight_num = len(gamenights)
         total = 0
         for gamenight in gamenights:
-            attendance = gamenight.calc_attendance_ratio()
+            attendees_num = len(gamenight.attendees.all())
+            invitees_num = len(gamenight.invitees.all())
+            attendance = round(attendees_num/invitees_num, 2)
             total += attendance
         average = round(total/gamenight_num, 2)
         return average
@@ -271,7 +273,19 @@ class UserStatsSerializer(serializers.Serializer):
         Takes a list of GameNight objects and returns the average session
         length (in minutes) among them.
         '''
-        pass
+        gamenight_num = len(gamenights)
+        total = 0
+        for gamenight in gamenights:
+            session_len = gamenight.calc_session_len()
+            if session_len == None:
+                gamenight_num -= 1
+                continue
+            total += session_len
+        if gamenight_num == 0:
+            average = None
+        else:
+            average = round(total/gamenight_num, 2)
+        return average
 
     def days_avg_game_num(self, gamenights):
         '''
