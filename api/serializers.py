@@ -200,6 +200,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     weekday_stats = serializers.SerializerMethodField()
     most_common_players = serializers.SerializerMethodField()
     most_played_games = serializers.SerializerMethodField()
+    least_played_games = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         fields = (
@@ -214,6 +215,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'weekday_stats',
             'most_common_players',
             'most_played_games',
+            'least_played_games',
         )
 
     # methods for weekday_stats field
@@ -276,7 +278,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     def days_avg_attend(self, gamenights):
         '''
         Takes a list of GameNight objects and returns the average attendance
-        ratio among them.
+        ratio among them as a percentage.
         '''
         gamenight_num = len(gamenights)
         total = 0
@@ -289,9 +291,9 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             attendance = round(attendees_num/invitees_num, 2)
             total += attendance
         if gamenight_num == 0:
-            average = None
+            return None
         else:
-            average = round(total/gamenight_num, 2)
+            average = round((total/gamenight_num)*100, 2)
         return average
 
     def days_avg_session_len(self, gamenights):
@@ -428,13 +430,38 @@ class DjoserUserSerializer(serializers.ModelSerializer):
         return return_list
 
 
-    # def get_least_played_games(self, obj):
-    #     return_list = []
-    #     games = obj.games.all()
-    #     freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
-    #     if len(games) < 5:
-    #         for game in games:
-
+    def get_least_played_games(self, obj):
+        return_list = []
+        games = obj.games.all()
+        freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
+        if len(games) < 5:
+            for game in games_sort:
+                game_data = other_data[game]
+                return_list.append(
+                    {
+                        'name': game,
+                        'bgg': game_data['bgg'],
+                        'pub_year': game_data['pub_year'],
+                        'image': game_data['image'],
+                        'played': freq_dict[game]
+                    }
+                )
+        else:
+            index = 0
+            while index < 5:
+                name = games_sort[index]
+                game_data = other_data[name]
+                return_list.append(
+                    {
+                        'name': name,
+                        'bgg': game_data['bgg'],
+                        'pub_year': game_data['pub_year'],
+                        'image': game_data['image'],
+                        'played': freq_dict[name]
+                    }
+                )
+                index += 1
+        return return_list
 
     def sort_games_by_play_num(self, games):
         other_data_dict = {}
