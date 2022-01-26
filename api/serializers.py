@@ -142,7 +142,7 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
 
 class GameNightSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer(read_only=True)
-    invitees = ContactSerializer(many=True)
+    invitees = serializers.SerializerMethodField()
     rsvps = RSVPForGameNightSerializer(many=True)
     attendees = ContactSerializer(many=True)
     games = GameListSerializer(read_only=True, many=True)
@@ -170,6 +170,26 @@ class GameNightSerializer(serializers.ModelSerializer):
 
     # def get_feedback(self, obj):
     #     return obj.calc_feedback()
+
+    def get_invitees(self, obj):
+        invitees = obj.invitees.all()
+        rsvps = obj.rsvps.all()
+        rsvp_list = []
+        inv_list = []
+        for rsvp in rsvps:
+            rsvp_list.append(rsvp.invitee)
+        for contact in invitees:
+            if contact in rsvp_list:
+                continue
+            inv_list.append(
+                {
+                    'pk': contact.pk,
+                    'first_name': contact.first_name,
+                    'last_name': contact.last_name,
+                    'email': contact.email
+                }
+            )
+        return inv_list
 
 
 class GameNightCreateSerializer(serializers.ModelSerializer):
@@ -201,6 +221,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     most_common_players = serializers.SerializerMethodField()
     most_played_games = serializers.SerializerMethodField()
     least_played_games = serializers.SerializerMethodField()
+    games_not_played = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         fields = (
@@ -216,6 +237,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'most_common_players',
             'most_played_games',
             'least_played_games',
+            'games_not_played',
         )
 
     # methods for weekday_stats field
@@ -436,6 +458,8 @@ class DjoserUserSerializer(serializers.ModelSerializer):
         freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
         if len(games) < 5:
             for game in games_sort:
+                if freq_dict[game] == 0:
+                    continue
                 game_data = other_data[game]
                 return_list.append(
                     {
@@ -448,8 +472,13 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                 )
         else:
             index = 0
-            while index < 5:
+            while len(return_list) < 5:
                 name = games_sort[index]
+                if freq_dict[name] == 0:
+                    index += 1
+                    if index == len(games_sort):
+                        break
+                    continue
                 game_data = other_data[name]
                 return_list.append(
                     {
@@ -461,6 +490,27 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     }
                 )
                 index += 1
+                if index == len(games_sort):
+                    break
+
+        return return_list
+
+    def get_games_not_played(self,obj):
+        return_list = []
+        games = obj.games.all()
+        freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
+        zeroes = [k for k,v in freq_dict.items() if v == 0]
+        for game in zeroes:
+            game_data = other_data[game]
+            return_list.append(
+                {
+                    'name': game,
+                    'bgg': game_data['bgg'],
+                    'pub_year': game_data['pub_year'],
+                    'image': game_data['image'],
+                    'played': freq_dict[game]
+                }
+            )
         return return_list
 
     def sort_games_by_play_num(self, games):
