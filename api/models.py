@@ -1,4 +1,5 @@
 from telnetlib import STATUS
+from time import strftime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -48,15 +49,29 @@ class GameNight(models.Model):
         return f"{self.rid}"
     
     def mail(self):
+        # date = self.date.strftime("%b %d")
+        invitees_list = self.invitees.all()
+        email_list = []
+        for invitee in invitees_list:           
+            email_list.append(invitee.email)
+
         send_mail(
-            subject=( f'Game night! {self.date} at {self.start_time}.  Be there!'),
-            message=( f'Please join us for super duper fun at {self.location}.  Click the url for details!'),
+            subject=( f'Game night! {self.date.strftime("%b %d")} at {self.start_time.strftime("%I:%M %p")}.  Be there!'),
+            message=( f'Please join us on {self.date.strftime("%b %d")} for super duper fun at {self.location}. Lets get started at {self.start_time.strftime("%I:%M %p")}.  Click the url for details!  https://game-master.netlify.app/game_night/{self.rid}/'),
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[settings.RECIPIENT_ADDRESS]
-            # recipient_list=[{contact['email']}]
+            recipient_list=email_list
             )
-    # print(f"{user['name']} is a {user['occupation']}")
-    # invitees = {contact['email']}
+
+    def finalized_mail(self):
+        attendees_list = self.attendees.all()
+        email_list = []
+        for attendee in attendees_list:           
+            email_list.append(attendee.email)
+
+        pass
+
+    def updated_mail(self):
+        pass
 
 
     def update_attendees(self, contact_pk):
@@ -77,6 +92,7 @@ class GameNight(models.Model):
                 self.attendees.remove(contact)
         else:
             invitees_list.add(contact)
+            
 
     def update_options(self, game_pk):
         options_list = self.options
@@ -177,6 +193,13 @@ class GeneralFeedback(models.Model):
 
     def __str__(self):
         return f"GeneralFeedback from {self.attendee.first_name} {self.attendee.last_name}"
+
+    def feedback_mail(self):
+        attendees_list = self.attendees.all()
+        email_list = []
+        for attendee in attendees_list:           
+            email_list.append(attendee.email)
+        pass
 
 
 class Contact(models.Model):
