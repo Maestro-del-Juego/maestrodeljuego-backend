@@ -458,6 +458,8 @@ class DjoserUserSerializer(serializers.ModelSerializer):
         freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
         if len(games) < 5:
             for game in games_sort:
+                if freq_dict[game] == 0:
+                    continue
                 game_data = other_data[game]
                 return_list.append(
                     {
@@ -470,8 +472,13 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                 )
         else:
             index = 0
-            while index < 5:
+            while len(return_list) < 5:
                 name = games_sort[index]
+                if freq_dict[name] == 0:
+                    index += 1
+                    if index == len(games_sort):
+                        break
+                    continue
                 game_data = other_data[name]
                 return_list.append(
                     {
@@ -483,6 +490,9 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     }
                 )
                 index += 1
+                if index == len(games_sort):
+                    break
+
         return return_list
 
     def get_games_not_played(self,obj):
