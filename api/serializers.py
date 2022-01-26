@@ -292,13 +292,38 @@ class UserStatsSerializer(serializers.Serializer):
         Takes a list of GameNight objects and returns the average number of
         unique games played among them.
         '''
-        pass
+        gamenight_num = len(gamenights)
+        total = 0
+        for gamenight in gamenights:
+            game_num = len(gamenight.games.all())
+            if game_num == 0:
+                gamenight_num -=1
+                continue
+            total += game_num
+        if gamenight_num == 0:
+            average = None
+        else:
+            average = round(total/gamenight_num, 2)
+        return average
 
     def days_avg_player_num(self, gamenights):
         '''
         Takes a list of GameNight objects and returns the average number of
         players among them.
         '''
+        gamenight_num = len(gamenights)
+        total = 0
+        for gamenight in gamenights:
+            player_num = len(gamenight.attendees.all())
+            if player_num ==0:
+                gamenight_num -=1
+                continue
+            total += player_num
+        if gamenight_num == 0:
+            average = None
+        else:
+            average = round(total/gamenight_num, 2)
+        return average
         pass
 
 
