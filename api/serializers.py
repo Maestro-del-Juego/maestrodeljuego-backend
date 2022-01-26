@@ -200,6 +200,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     weekday_stats = serializers.SerializerMethodField()
     most_common_players = serializers.SerializerMethodField()
     most_played_games = serializers.SerializerMethodField()
+    least_played_games = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         fields = (
@@ -214,6 +215,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'weekday_stats',
             'most_common_players',
             'most_played_games',
+            'least_played_games',
         )
 
     # methods for weekday_stats field
@@ -276,7 +278,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     def days_avg_attend(self, gamenights):
         '''
         Takes a list of GameNight objects and returns the average attendance
-        ratio among them.
+        ratio among them as a percentage.
         '''
         gamenight_num = len(gamenights)
         total = 0
@@ -289,9 +291,9 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             attendance = round(attendees_num/invitees_num, 2)
             total += attendance
         if gamenight_num == 0:
-            average = None
+            return None
         else:
-            average = round(total/gamenight_num, 2)
+            average = round((total/gamenight_num)*100, 2)
         return average
 
     def days_avg_session_len(self, gamenights):
@@ -367,43 +369,113 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             while index > max:
                 name = contacts_sort[index]
                 pk = name_pk_dict[name]
-                return_list.append({'name': name, 'pk': pk, 'attended': freq_dict[name]})
+                return_list.append(
+                    {
+                        'name': name,
+                        'pk': pk,
+                        'attended': freq_dict[name]
+                    }
+                )
                 index -= 1
         else:
             index = -1
             while index > -6:
                 name = contacts_sort[index]
                 pk = name_pk_dict[name]
-                return_list.append({'name': name, 'pk': pk, 'attended': freq_dict[name]})
+                return_list.append(
+                    {
+                        'name': name,
+                        'pk': pk,
+                        'attended': freq_dict[name]
+                    }
+                )
                 index -= 1
         return return_list
 
     def get_most_played_games(self, obj):
-        games = obj.games.all()
         return_list = []
-        other_data_dict = {}
-        freq_dict = {}
-        for game in games:
-            gamenights = len(game.gamenights.all())
-            freq_dict[str(game)] = gamenights
-            other_data_dict[str(game)] = {'bgg': game.bgg, 'pub_year': game.pub_year, 'image': game.image}
-        games_sort = sorted(freq_dict, key=freq_dict.__getitem__)
+        games = obj.games.all()
+        freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
         if len(games) < 5:
             index = -1
             max = -len(games) - 1
             while index > max:
                 name = games_sort[index]
-                other_data = other_data_dict[name]
-                return_list.append({'name': name, 'bgg': other_data['bgg'], 'pub_year': other_data['pub_year'], 'image': other_data['image'], 'played': freq_dict[name]})
+                game_data = other_data[name]
+                return_list.append(
+                    {
+                        'name': name,
+                        'bgg': game_data['bgg'],
+                        'pub_year': game_data['pub_year'],
+                        'image': game_data['image'],
+                        'played': freq_dict[name]
+                    }
+                )
                 index -= 1
         else:
             index = -1
             while index > -6:
                 name = games_sort[index]
-                other_data = other_data_dict[name]
-                return_list.append({'name': name, 'bgg': other_data['bgg'], 'pub_year': other_data['pub_year'], 'image': other_data['image'], 'played': freq_dict[name]})
+                game_data = other_data[name]
+                return_list.append(
+                    {
+                        'name': name,
+                        'bgg': game_data['bgg'],
+                        'pub_year': game_data['pub_year'],
+                        'image': game_data['image'],
+                        'played': freq_dict[name]
+                    }
+                )
                 index -= 1
         return return_list
+
+
+    def get_least_played_games(self, obj):
+        return_list = []
+        games = obj.games.all()
+        freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
+        if len(games) < 5:
+            for game in games_sort:
+                game_data = other_data[game]
+                return_list.append(
+                    {
+                        'name': game,
+                        'bgg': game_data['bgg'],
+                        'pub_year': game_data['pub_year'],
+                        'image': game_data['image'],
+                        'played': freq_dict[game]
+                    }
+                )
+        else:
+            index = 0
+            while index < 5:
+                name = games_sort[index]
+                game_data = other_data[name]
+                return_list.append(
+                    {
+                        'name': name,
+                        'bgg': game_data['bgg'],
+                        'pub_year': game_data['pub_year'],
+                        'image': game_data['image'],
+                        'played': freq_dict[name]
+                    }
+                )
+                index += 1
+        return return_list
+
+    def sort_games_by_play_num(self, games):
+        other_data_dict = {}
+        freq_dict = {}
+        for game in games:
+            gamenights = len(game.gamenights.all())
+            freq_dict[str(game)] = gamenights
+            other_data_dict[str(game)] = {
+                'bgg': game.bgg,
+                'pub_year': game.pub_year,
+                'image': game.image
+            }
+        games_sort = sorted(freq_dict, key=freq_dict.__getitem__)
+        return freq_dict, other_data_dict, games_sort
 
 
 
