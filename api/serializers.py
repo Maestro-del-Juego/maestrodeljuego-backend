@@ -388,7 +388,6 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             freq_dict[str(game)] = gamenights
             other_data_dict[str(game)] = {'bgg': game.bgg, 'pub_year': game.pub_year, 'image': game.image}
         games_sort = sorted(freq_dict, key=freq_dict.__getitem__)
-        breakpoint()
         if len(games) < 5:
             index = -1
             max = -len(games) - 1
