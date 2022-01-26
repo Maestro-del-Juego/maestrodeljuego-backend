@@ -199,7 +199,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     gamenights = GameNightSerializer(many=True, read_only=True)
     weekday_stats = serializers.SerializerMethodField()
     most_common_players = serializers.SerializerMethodField()
-    most_common_games = serializers.SerializerMethodField()
+    most_played_games = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         fields = (
@@ -213,7 +213,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'gamenights',
             'weekday_stats',
             'most_common_players',
-            'most_common_games',
+            'most_played_games',
         )
 
     # methods for weekday_stats field
@@ -378,7 +378,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                 index -= 1
         return return_list
 
-    def get_most_common_games(self, obj):
+    def get_most_played_games(self, obj):
         games = obj.games.all()
         return_list = []
         other_data_dict = {}
