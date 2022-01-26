@@ -2,6 +2,7 @@ from telnetlib import STATUS
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
+from datetime import datetime, timedelta
 
 
 class CustomUser(AbstractUser):
@@ -105,6 +106,22 @@ class GameNight(models.Model):
             total += feedback.overall_rating
         overall_avg = round(total/len(feedbacks), 2)
         return overall_avg
+
+    def calc_session_len(self):
+        date = self.date
+        t1 = self.start_time
+        t2 = self.end_time
+        if t2 == None:
+            return None
+        d1 = datetime(date.year, date.month, date.day, t1.hour, t1.minute)
+        if t1.hour > t2.hour:
+            diff = timedelta(days=1)
+            dt = datetime(date.year, date.month, date.day, t2.hour, t2.minute)
+            d2 = dt + diff
+        else:
+            d2 = datetime(date.year, date.month, date.day, t2.hour, t2.minute)
+        delta = d2 - d1
+        return delta.total_seconds()/60
 
 
 class Tag(models.Model):
