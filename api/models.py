@@ -2,6 +2,9 @@ from telnetlib import STATUS
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.mail import send_mail
+from games import settings
+
 
 
 class CustomUser(AbstractUser):
@@ -43,6 +46,18 @@ class GameNight(models.Model):
 
     def __str__(self):
         return f"{self.rid}"
+    
+    def mail(self):
+        send_mail(
+            subject=( f'Game night! {self.date} at {self.start_time}.  Be there!'),
+            message=( f'Please join us for super duper fun at {self.location}.  Click the url for details!'),
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[settings.RECIPIENT_ADDRESS]
+            # recipient_list=[{contact['email']}]
+            )
+    # print(f"{user['name']} is a {user['occupation']}")
+    # invitees = {contact['email']}
+
 
     def update_attendees(self, contact_pk):
         attendees_list = self.attendees

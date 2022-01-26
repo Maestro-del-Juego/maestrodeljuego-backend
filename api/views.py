@@ -1,9 +1,5 @@
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
-from django.views.generic import FormView
-from .forms import ContactForm
-from django.urls import reverse_lazy
-# NOT SURE WHAT reverse_lazy does or if we need it
 from django.core.exceptions import BadRequest
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -171,6 +167,8 @@ class GameNightView(ListCreateAPIView):
     def perform_create(self, serializer):
         rand_id = self.get_rid()
         serializer.save(user=self.request.user, rid=rand_id)
+        gamenight = GameNight.objects.get(rid=rand_id)
+        gamenight.mail()
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -414,6 +412,15 @@ class RSVPListCreateView(ListCreateAPIView):
 #     form = ContactForm(request.POST)
 #     if form.is_valid():
 #         form.send()
-#         return redirect('contact:success')
+#         # return redirect('contact:success')
 # else:
 #     form = ContactForm())
+
+# def mail(request): 
+#     send_mail(
+#         'Subject',
+#         'call things related to gamenight using dot notaion',
+#         'settings.EMAIL_HOST_USER',
+#         ['call things related to gamenight using dot notation example self.rid'],
+#         fail_silently=False)
+        
