@@ -198,6 +198,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     contacts = ContactSerializer(many=True, read_only=True)
     gamenights = GameNightSerializer(many=True, read_only=True)
     weekday_stats = serializers.SerializerMethodField()
+    most_common_players = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         fields = (
@@ -210,8 +211,10 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'contacts',
             'gamenights',
             'weekday_stats',
+            'most_common_players'
         )
 
+    # methods for weekday_stats field
     def get_weekday_stats(self, obj):
         user = obj
         gamenight_dict = self.build_week_dict(user)
@@ -345,6 +348,34 @@ class DjoserUserSerializer(serializers.ModelSerializer):
         else:
             average = round(total/gamenight_num, 2)
         return average
+
+    def get_most_common_players(self, obj):
+        contacts = obj.contacts.all()
+        return_list = []
+        name_pk_dict = {}
+        freq_dict = {}
+        for contact in contacts:
+            gamenights = len(contact.attended.all())
+            freq_dict[str(contact)] = gamenights
+            name_pk_dict[str(contact)] = contact.pk
+        contacts_sort = sorted(freq_dict, key=freq_dict.__getitem__)
+        if len(contacts) < 5:
+            index = -1
+            max = -len(contacts) - 1
+            while index > max:
+                name = contacts_sort[index]
+                pk = name_pk_dict[name]
+                return_list.append({'name': name, 'pk': pk, 'attended': freq_dict[name]})
+                index -= 1
+        else:
+            index = -1
+            while index > -6:
+                name = contacts_sort[index]
+                pk = name_pk_dict[name]
+                return_list.append({'name': name, 'pk': pk, 'attended': freq_dict[name]})
+                index -= 1
+        return return_list
+
 
 
 class DjoserRegistrationSerializer(UserCreatePasswordRetypeSerializer):
