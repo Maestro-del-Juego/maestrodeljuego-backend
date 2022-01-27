@@ -523,6 +523,11 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     if index == len(games_sort):
                         break
                     continue
+                gamenights = games.filter(title=name)[0].gamenights.all()
+                most_recent = gamenights[0].date
+                for gamenight in gamenights:
+                    if gamenight.date > most_recent:
+                        most_recent = gamenight.date
                 game_data = other_data[name]
                 return_list.append(
                     {
@@ -530,6 +535,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                         'bgg': game_data['bgg'],
                         'pub_year': game_data['pub_year'],
                         'image': game_data['image'],
+                        'last_played': str(most_recent),
                         'played': freq_dict[name]
                     }
                 )
@@ -637,8 +643,8 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             game_cats = game.categories.all()
             for cat in game_cats:
                 count_dict[cat.name] += freq_dict[str(game)]
-        total = sum(count_dict.values())
         played_dict = {k:v for k,v in count_dict.items() if v != 0}
+        total = sum(played_dict.values())
 
 
 class DjoserRegistrationSerializer(UserCreatePasswordRetypeSerializer):
