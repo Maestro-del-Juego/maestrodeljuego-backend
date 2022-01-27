@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, GeneralFeedback, GameFeedback, RSVP
+from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, GeneralFeedback, GameFeedback, RSVP, Category
 from djoser.serializers import UserCreatePasswordRetypeSerializer
 from drf_writable_nested import WritableNestedModelSerializer
 from django.db.models.query import QuerySet
@@ -218,12 +218,14 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     wishlist = GameListSerializer(many=True, read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
     gamenights = GameNightSerializer(many=True, read_only=True)
+    gamenights_finished = serializers.SerializerMethodField()
     weekday_stats = serializers.SerializerMethodField()
     most_common_players = serializers.SerializerMethodField()
     most_played_games = serializers.SerializerMethodField()
     least_played_games = serializers.SerializerMethodField()
     games_not_played = serializers.SerializerMethodField()
     highest_rated_games = serializers.SerializerMethodField()
+    most_played_categories = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         fields = (
@@ -235,13 +237,18 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'wishlist',
             'contacts',
             'gamenights',
+            'gamenights_finished',
             'weekday_stats',
             'most_common_players',
             'most_played_games',
             'least_played_games',
             'games_not_played',
             'highest_rated_games',
+            'most_played_categories',
         )
+
+    def get_gamenights_finished(self, obj):
+        return len(obj.gamenights.filter(status="Finalized"))
 
     # methods for weekday_stats field
     def get_weekday_stats(self, obj):
@@ -491,6 +498,11 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             for game in games_sort:
                 if freq_dict[game] == 0:
                     continue
+                gamenights = games.filter(title=game)[0].gamenights.all()
+                most_recent = gamenights[0].date
+                for gamenight in gamenights:
+                    if gamenight.date > most_recent:
+                        most_recent = gamenight.date
                 game_data = other_data[game]
                 return_list.append(
                     {
@@ -498,6 +510,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                         'bgg': game_data['bgg'],
                         'pub_year': game_data['pub_year'],
                         'image': game_data['image'],
+                        'last_played': str(most_recent),
                         'played': freq_dict[game]
                     }
                 )
@@ -612,6 +625,20 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     }
                 )
         return final_list
+
+    def get_most_played_categories(self, obj):
+        categories = Category.objects.all()
+        games = obj.games.all()
+        freq_dict, other, g_sort = self.sort_games_by_play_num(games)
+        count_dict = {}
+        for category in categories:
+            count_dict[category.name] = 0
+        for game in games:
+            game_cats = game.categories.all()
+            for cat in game_cats:
+                count_dict[cat.name] += freq_dict[str(game)]
+        total = sum(count_dict.values())
+        played_dict = {k:v for k,v in count_dict.items() if v != 0}
 
 
 class DjoserRegistrationSerializer(UserCreatePasswordRetypeSerializer):
