@@ -223,6 +223,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     most_played_games = serializers.SerializerMethodField()
     least_played_games = serializers.SerializerMethodField()
     games_not_played = serializers.SerializerMethodField()
+    highest_rated_games = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         fields = (
@@ -239,6 +240,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'most_played_games',
             'least_played_games',
             'games_not_played',
+            'highest_rated_games',
         )
 
     # methods for weekday_stats field
@@ -558,6 +560,58 @@ class DjoserUserSerializer(serializers.ModelSerializer):
         games_sort = sorted(freq_dict, key=freq_dict.__getitem__)
         return freq_dict, other_data_dict, games_sort
 
+    def get_highest_rated_games(self, obj):
+        games = obj.games.all()
+        other_data = {}
+        rating_dict = {}
+        final_list = []
+        for game in games:
+            all_gamenights = game.gamenights.all()
+            gamenights = all_gamenights.filter(user=obj)
+            total = 0
+            for gamenight in gamenights:
+                fback = game.calc_feedback(gamenight)
+                if fback is None:
+                    continue
+                total += fback
+            if total == 0:
+                continue
+            rating_dict[str(game)] = round(total/len(gamenights), 2)
+            other_data[str(game)] = {
+                'bgg': game.bgg,
+                'pub_year': game.pub_year,
+                'image': game.image
+            }
+        games_sort = sorted(rating_dict, key=rating_dict.__getitem__)
+        if len(games) < 6:
+            for game in reversed(games_sort):
+                if game not in rating_dict:
+                    continue
+                game_data = other_data[game]
+                final_list.append(
+                    {
+                        'name': game,
+                        'bgg': game_data['bgg'],
+                        'pub_year': game_data['pub_year'],
+                        'image': game_data['image'],
+                        'rating': rating_dict[game]
+                    }
+                )
+        else:
+            for game in reversed(games_sort):
+                if game not in rating_dict:
+                    continue
+                game_data = other_data[game]
+                final_list.append(
+                    {
+                        'name': game,
+                        'bgg': game_data['bgg'],
+                        'pub_year': game_data['pub_year'],
+                        'image': game_data['image'],
+                        'rating': rating_dict[game]
+                    }
+                )
+        return final_list
 
 
 class DjoserRegistrationSerializer(UserCreatePasswordRetypeSerializer):
