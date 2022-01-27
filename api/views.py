@@ -168,7 +168,7 @@ class GameNightView(ListCreateAPIView):
         rand_id = self.get_rid()
         serializer.save(user=self.request.user, rid=rand_id)
         gamenight = GameNight.objects.get(rid=rand_id)
-        gamenight.mail()
+        gamenight.mail_gamenight_create()
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -228,10 +228,14 @@ class GameNightDetailView(RetrieveUpdateAPIView):
                 gamenight.save()
         elif 'invitees' in data:
             contacts = data['invitees']
+            new_emails = []
             for contact in contacts:
                 pk = contact['pk']
                 gamenight.update_invitees(pk)
                 gamenight.save()
+                new_emails.append(contact['email'])
+            gamenight.mail_update_invitees(new_emails)
+
         elif 'options' in data:
             games = data['options']
             for game in games:
@@ -407,20 +411,4 @@ class RSVPListCreateView(ListCreateAPIView):
         return Response(not_saved, status=status.HTTP_418_IM_A_TEAPOT, headers=headers)
 
 
-# #BELOW IS FUNCTION BASED VIEW.  INSERT LINES STARTING W/ form = ContactForm.... INTO CORRECT FUNCTIONS?
-# if request.method == 'POST':
-#     form = ContactForm(request.POST)
-#     if form.is_valid():
-#         form.send()
-#         # return redirect('contact:success')
-# else:
-#     form = ContactForm())
-
-# def mail(request): 
-#     send_mail(
-#         'Subject',
-#         'call things related to gamenight using dot notaion',
-#         'settings.EMAIL_HOST_USER',
-#         ['call things related to gamenight using dot notation example self.rid'],
-#         fail_silently=False)
         
