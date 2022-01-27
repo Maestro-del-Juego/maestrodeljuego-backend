@@ -218,6 +218,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     wishlist = GameListSerializer(many=True, read_only=True)
     contacts = ContactSerializer(many=True, read_only=True)
     gamenights = GameNightSerializer(many=True, read_only=True)
+    gamenights_finished = serializers.SerializerMethodField()
     weekday_stats = serializers.SerializerMethodField()
     most_common_players = serializers.SerializerMethodField()
     most_played_games = serializers.SerializerMethodField()
@@ -236,6 +237,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'wishlist',
             'contacts',
             'gamenights',
+            'gamenights_finished',
             'weekday_stats',
             'most_common_players',
             'most_played_games',
@@ -244,6 +246,9 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'highest_rated_games',
             'most_played_categories',
         )
+
+    def get_gamenights_finished(self, obj):
+        return len(obj.gamenights.filter(status="Finalized"))
 
     # methods for weekday_stats field
     def get_weekday_stats(self, obj):
