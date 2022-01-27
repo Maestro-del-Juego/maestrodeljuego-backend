@@ -5,6 +5,7 @@ from drf_writable_nested import WritableNestedModelSerializer
 from django.db.models.query import QuerySet
 from calendar import day_name
 from datetime import date
+import random
 
 
 class GameListSerializer(serializers.ModelSerializer):
@@ -496,13 +497,13 @@ class DjoserUserSerializer(serializers.ModelSerializer):
         return return_list
 
     def get_games_not_played(self,obj):
-        return_list = []
+        final_list = []
         games = obj.games.all()
         freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
         zeroes = [k for k,v in freq_dict.items() if v == 0]
         for game in zeroes:
             game_data = other_data[game]
-            return_list.append(
+            final_list.append(
                 {
                     'name': game,
                     'bgg': game_data['bgg'],
@@ -511,7 +512,9 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     'played': freq_dict[game]
                 }
             )
-        return return_list
+        if len(final_list) < 6:
+            return final_list
+        return random.sample(final_list, 5)
 
     def sort_games_by_play_num(self, games):
         other_data_dict = {}
