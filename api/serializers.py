@@ -439,56 +439,43 @@ class DjoserUserSerializer(serializers.ModelSerializer):
         return return_list
 
     def get_most_played_games(self, obj):
-        return_list = []
         games = obj.games.all()
         freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
-        if len(games) < 5:
-            index = -1
-            max = -len(games) - 1
-            while index > max:
-                name = games_sort[index]
-                if freq_dict[name] == 0:
-                    index -= 1
-                    if index == max:
-                        break
-                    continue
-                game_data = other_data[name]
-                return_list.append(
-                    {
-                        'name': name,
-                        'bgg': game_data['bgg'],
-                        'pub_year': game_data['pub_year'],
-                        'image': game_data['image'],
-                        'played': freq_dict[name]
-                    }
-                )
-                index -= 1
-                if index == max:
+        played_dict = {k:v for k,v in freq_dict.items() if v != 0}
+        for game in games_sort.copy():
+            if game not in played_dict:
+                games_sort.remove(game)
+        total = sum(played_dict.values())
+        perc_left = 100
+        perc_added = 0
+        final_list = []
+        for game in reversed(games_sort):
+            percentage = round((played_dict[game]/total)*100, 2)
+            if len(final_list) > 8:
+                if percentage < perc_left:
+                    final_list.append(
+                        {
+                            'title': 'Other',
+                            'percentage': perc_left
+                        }
+                    )
                     break
-        else:
-            index = -1
-            while index > -6:
-                name = games_sort[index]
-                if freq_dict[name] == 0:
-                    index -= 1
-                    if index == -6:
-                        break
-                    continue
-                game_data = other_data[name]
-                return_list.append(
-                    {
-                        'name': name,
-                        'bgg': game_data['bgg'],
-                        'pub_year': game_data['pub_year'],
-                        'image': game_data['image'],
-                        'played': freq_dict[name]
-                    }
-                )
-                index -= 1
-                if index == -6:
-                    break
-        return return_list
-
+            perc_left -= percentage
+            perc_added += percentage
+            game_data = other_data[game]
+            if perc_added > 100:
+                percentage -= (perc_added - 100)
+            final_list.append(
+                {
+                    'title': game,
+                    'bgg': game_data['bgg'],
+                    'pub_year': game_data['pub_year'],
+                    'image': game_data['image'],
+                    'played': played_dict[game],
+                    'percentage': percentage
+                }
+            )
+        return final_list
 
     def get_least_played_games(self, obj):
         return_list = []
