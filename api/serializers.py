@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, GeneralFeedback, GameFeedback, RSVP
+from .models import Game, CustomUser, Tag, GameNight, Contact, Voting, GeneralFeedback, GameFeedback, RSVP, Category
 from djoser.serializers import UserCreatePasswordRetypeSerializer
 from drf_writable_nested import WritableNestedModelSerializer
 from django.db.models.query import QuerySet
@@ -224,6 +224,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     least_played_games = serializers.SerializerMethodField()
     games_not_played = serializers.SerializerMethodField()
     highest_rated_games = serializers.SerializerMethodField()
+    most_played_categories = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         fields = (
@@ -241,6 +242,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'least_played_games',
             'games_not_played',
             'highest_rated_games',
+            'most_played_categories',
         )
 
     # methods for weekday_stats field
@@ -612,6 +614,19 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     }
                 )
         return final_list
+
+    def get_most_played_categories(self, obj):
+        categories = Category.objects.all()
+        games = obj.games.all()
+        count_dict = {}
+        for category in categories:
+            count_dict[category.name] = 0
+        for game in games:
+            game_cats = game.categories.all()
+            for cat in game_cats:
+                count_dict[cat.name] += 1
+        total = sum(count_dict.values())
+        played_dict = {k:v for k,v in count_dict.items() if v != 0}
 
 
 class DjoserRegistrationSerializer(UserCreatePasswordRetypeSerializer):
