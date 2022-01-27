@@ -231,9 +231,10 @@ class GameNightDetailView(RetrieveUpdateAPIView):
             new_emails = []
             for contact in contacts:
                 pk = contact['pk']
+                contact_obj = Contact.objects.get(pk=pk)
                 gamenight.update_invitees(pk)
                 gamenight.save()
-                new_emails.append(contact['email'])
+                new_emails.append(contact_obj.email)
             gamenight.mail_update_invitees(new_emails)
 
         elif 'options' in data:
@@ -316,8 +317,10 @@ class GeneralFeedbackView(CreateAPIView):
         attendee_pk = self.request.data['attendee']
         contact = Contact.objects.get(pk=attendee_pk)
         gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
+
         if not GeneralFeedback.objects.filter(gamenight=gamenight, attendee=contact).exists():
             serializer.save(gamenight=gamenight, attendee=contact)
+
             return True
         return False
 
@@ -326,6 +329,7 @@ class GeneralFeedbackView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         saved = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+        
         if saved:
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         not_saved = {'detail': 'Attendee has already left feedback.'}
@@ -363,6 +367,7 @@ class GameFeedbackView(CreateAPIView):
             serializer.save(gamenight=gamenight, attendee=contact)
             return True
         return False
+
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, many=True)

@@ -63,6 +63,7 @@ class GameNight(models.Model):
 #method goes on GameNightDetailView at end of elif 'invitees' in data...
 #not sure how to get updated invitees 
     def mail_update_invitees(self, new_emails):
+
         send_mail(
             subject=( f'Game night! {self.date.strftime("%b %d")} at {self.start_time.strftime("%I:%M %p")}.  Be there!'),
             message=( f'Please join us on {self.date.strftime("%b %d")} for super duper fun at {self.location}. Lets get started at {self.start_time.strftime("%I:%M %p")}  Click the url for details!  https://game-master.netlify.app/game_night/{self.rid}/'),
@@ -85,7 +86,7 @@ class GameNight(models.Model):
 
     def update_attendees(self, contact_pk):
         attendees_list = self.attendees
-        contact = Contact.objects.get(pk=contact_pk)
+        contact = get(pk=contact_pk)
         if contact in self.invitees.all():
             if contact in attendees_list.all():
                 attendees_list.remove(contact)
