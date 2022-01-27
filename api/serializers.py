@@ -493,6 +493,11 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             for game in games_sort:
                 if freq_dict[game] == 0:
                     continue
+                gamenights = games.filter(title=game)[0].gamenights.all()
+                most_recent = gamenights[0].date
+                for gamenight in gamenights:
+                    if gamenight.date > most_recent:
+                        most_recent = gamenight.date
                 game_data = other_data[game]
                 return_list.append(
                     {
@@ -500,6 +505,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                         'bgg': game_data['bgg'],
                         'pub_year': game_data['pub_year'],
                         'image': game_data['image'],
+                        'last_played': str(most_recent),
                         'played': freq_dict[game]
                     }
                 )
@@ -618,13 +624,14 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     def get_most_played_categories(self, obj):
         categories = Category.objects.all()
         games = obj.games.all()
+        freq_dict, other, g_sort = self.sort_games_by_play_num(games)
         count_dict = {}
         for category in categories:
             count_dict[category.name] = 0
         for game in games:
             game_cats = game.categories.all()
             for cat in game_cats:
-                count_dict[cat.name] += 1
+                count_dict[cat.name] += freq_dict[str(game)]
         total = sum(count_dict.values())
         played_dict = {k:v for k,v in count_dict.items() if v != 0}
 
