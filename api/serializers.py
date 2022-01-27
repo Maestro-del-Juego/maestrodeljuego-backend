@@ -391,6 +391,11 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             max = -len(contacts) - 1
             while index > max:
                 name = contacts_sort[index]
+                if freq_dict[name] == 0:
+                    index -= 1
+                    if index == max:
+                        break
+                    continue
                 pk = name_pk_dict[name]
                 return_list.append(
                     {
@@ -400,10 +405,17 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     }
                 )
                 index -= 1
+                if index == max:
+                    break
         else:
             index = -1
             while index > -6:
                 name = contacts_sort[index]
+                if freq_dict[name] == 0:
+                    index -= 1
+                    if index == -6:
+                        break
+                    continue
                 pk = name_pk_dict[name]
                 return_list.append(
                     {
@@ -413,6 +425,8 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     }
                 )
                 index -= 1
+                if index == -6:
+                    break
         return return_list
 
     def get_most_played_games(self, obj):
@@ -424,6 +438,11 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             max = -len(games) - 1
             while index > max:
                 name = games_sort[index]
+                if freq_dict[name] == 0:
+                    index -= 1
+                    if index == max:
+                        break
+                    continue
                 game_data = other_data[name]
                 return_list.append(
                     {
@@ -435,10 +454,17 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     }
                 )
                 index -= 1
+                if index == max:
+                    break
         else:
             index = -1
             while index > -6:
                 name = games_sort[index]
+                if freq_dict[name] == 0:
+                    index -= 1
+                    if index == -6:
+                        break
+                    continue
                 game_data = other_data[name]
                 return_list.append(
                     {
@@ -450,6 +476,8 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     }
                 )
                 index -= 1
+                if index == -6:
+                    break
         return return_list
 
 
