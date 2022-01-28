@@ -141,6 +141,27 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
     #     return rating
 
 
+class ContactForGameNightSerializer(serializers.ModelSerializer):
+    favorite_games = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Contact
+        fields = (
+            'pk',
+            'first_name',
+            'last_name',
+            'email',
+            'favorite_games',
+        )
+
+    def get_favorite_games(self, obj):
+        votes = obj.voting.all()
+        gamefbacks = obj.gamefeedback.all()
+        voted_games_dict = {}
+        fback_games_dict = {}
+        
+
+
 class GameNightSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer(read_only=True)
     invitees = serializers.SerializerMethodField()
