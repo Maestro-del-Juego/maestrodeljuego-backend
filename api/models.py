@@ -212,7 +212,7 @@ class GameFeedback(models.Model):
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
 
     def __repr__(self):
-        return f"<GameFeedback {self.game.title} by {self.feedback.attendee.first_name} {self.feedback.attendee.last_name}>"
+        return f"<GameFeedback {self.game.title} by {self.attendee.first_name} {self.attendee.last_name}>"
 
     def __str__(self):
         return {self.feedback}
