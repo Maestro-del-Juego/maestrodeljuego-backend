@@ -146,7 +146,7 @@ class GameNightSerializer(serializers.ModelSerializer):
     invitees = serializers.SerializerMethodField()
     rsvps = RSVPForGameNightSerializer(many=True)
     attendees = ContactSerializer(many=True)
-    games = GameListSerializer(read_only=True, many=True)
+    games = GameForGameNightSerializer(read_only=True, many=True)
     options = GameForGameNightSerializer(read_only=True, many=True)
     # feedback = serializers.SerializerMethodField()
 
