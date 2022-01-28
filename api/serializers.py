@@ -501,7 +501,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     final_list.append(
                         {
                             'title': 'Other',
-                            'percentage': perc_left
+                            'percentage': round(perc_left, 2)
                         }
                     )
                     break
@@ -688,7 +688,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     final_list.append(
                         {
                             'name': 'Other',
-                            'percentage': perc_left
+                            'percentage': round(perc_left, 2)
                         }
                     )
                     break
