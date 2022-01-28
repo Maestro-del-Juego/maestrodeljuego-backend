@@ -517,7 +517,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     'pub_year': game_data['pub_year'],
                     'image': game_data['image'],
                     'played': played_dict[game],
-                    'percentage': percentage
+                    'percentage': round(percentage, 2)
                 }
             )
         return final_list
