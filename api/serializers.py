@@ -159,7 +159,31 @@ class ContactForGameNightSerializer(serializers.ModelSerializer):
         gamefbacks = obj.gamefeedback.all()
         voted_games_dict = {}
         fback_games_dict = {}
-        
+        for fback in gamefbacks:
+            game = fback.game
+            if game.title in fback_games_dict:
+                fback_games_dict[game.title] += 1
+            else:
+                fback_games_dict[game.title] = 1
+        for vote in votes:
+            game = vote.game
+            if game.title in fback_games_dict:
+                voted_games_dict[game.title] += 1
+            else:
+                voted_games_dict[game.title] = 1
+        fback_sort = sorted(fback_games_dict, key=fback_games_dict.__getitem__)
+        final_list = []
+        for game in reversed(fback_sort):
+            game_obj = gamefbacks.filter(title=game)[0]
+            final_list.append(
+                {
+                    'title': game,
+                    'bgg': game_obj.bgg,
+                    'pub_year': game_obj.pub_year,
+                    'image': game_obj.image,
+                    'avg_feedback': fback_games_dict[game]
+                }
+            )
 
 
 class GameNightSerializer(serializers.ModelSerializer):
