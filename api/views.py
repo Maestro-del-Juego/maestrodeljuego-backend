@@ -228,14 +228,10 @@ class GameNightDetailView(RetrieveUpdateAPIView):
                 gamenight.save()
         elif 'invitees' in data:
             contacts = data['invitees']
-            new_emails = []
             for contact in contacts:
                 pk = contact['pk']
-                contact_obj = Contact.objects.get(pk=pk)
                 gamenight.update_invitees(pk)
                 gamenight.save()
-                new_emails.append(contact_obj.email)
-            gamenight.mail_update_invitees(new_emails)
 
         elif 'options' in data:
             games = data['options']

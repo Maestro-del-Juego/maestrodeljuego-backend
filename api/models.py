@@ -86,7 +86,7 @@ class GameNight(models.Model):
 
     def update_attendees(self, contact_pk):
         attendees_list = self.attendees
-        contact = get(pk=contact_pk)
+        contact = Contact.objects.get(pk=contact_pk)
         if contact in self.invitees.all():
             if contact in attendees_list.all():
                 attendees_list.remove(contact)
@@ -102,7 +102,7 @@ class GameNight(models.Model):
                 self.attendees.remove(contact)
         else:
             invitees_list.add(contact)
-            
+            self.mail_update_invitees([contact.email])
 
     def update_options(self, game_pk):
         options_list = self.options
