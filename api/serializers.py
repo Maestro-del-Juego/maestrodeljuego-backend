@@ -530,7 +530,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             for game in games_sort:
                 if freq_dict[game] == 0:
                     continue
-                gamenights = games.filter(title=game)[0].gamenights.filter(status="Finalized")
+                gamenights = games.filter(title=game)[0].gamenights.all()
                 most_recent = gamenights[0].date
                 for gamenight in gamenights:
                     if gamenight.date > most_recent:
@@ -555,7 +555,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     if index == len(games_sort):
                         break
                     continue
-                gamenights = games.filter(title=name)[0].gamenights.filter(status="Finalized")
+                gamenights = games.filter(title=name)[0].gamenights.all()
                 most_recent = gamenights[0].date
                 for gamenight in gamenights:
                     if gamenight.date > most_recent:
