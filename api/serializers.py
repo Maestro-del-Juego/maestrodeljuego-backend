@@ -225,7 +225,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     least_played_games = serializers.SerializerMethodField()
     games_not_played = serializers.SerializerMethodField()
     highest_rated_games = serializers.SerializerMethodField()
-    most_played_categories = serializers.SerializerMethodField()
+    # most_played_categories = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
         fields = (
@@ -244,7 +244,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'least_played_games',
             'games_not_played',
             'highest_rated_games',
-            'most_played_categories',
+            # 'most_played_categories',
         )
 
     def get_gamenights_finished(self, obj):
@@ -619,46 +619,46 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                 )
         return final_list
 
-    def get_most_played_categories(self, obj):
-        categories = Category.objects.all()
-        games = obj.games.all()
-        freq_dict, other, g_sort = self.sort_games_by_play_num(games)
-        count_dict = {}
-        for category in categories:
-            count_dict[category.name] = 0
-        for game in games:
-            game_cats = game.categories.all()
-            for cat in game_cats:
-                count_dict[cat.name] += freq_dict[str(game)]
-        played_dict = {k:v for k,v in count_dict.items() if v != 0}
-        total = sum(played_dict.values())
-        sorted_cats = sorted(played_dict, key=played_dict.__getitem__)
-        perc_left = 100
-        perc_added = 0
-        final_list = []
-        for category in reversed(sorted_cats):
-            percentage = round((played_dict[category]/total)*100, 2)
-            if len(final_list) > 8:
-                if percentage < perc_left:
-                    final_list.append(
-                        {
-                            'name': 'Other',
-                            'percentage': perc_left
-                        }
-                    )
-                    break
-            perc_left -= percentage
-            perc_added += percentage
-            if perc_added > 100:
-                percentage -= (perc_added - 100)
-            final_list.append(
-                {
-                    'name': category,
-                    'games_played': played_dict[category],
-                    'percentage': round(percentage, 2)
-                }
-            )
-        return final_list
+    # def get_most_played_categories(self, obj):
+    #     categories = Category.objects.all()
+    #     games = obj.games.all()
+    #     freq_dict, other, g_sort = self.sort_games_by_play_num(games)
+    #     count_dict = {}
+    #     for category in categories:
+    #         count_dict[category.name] = 0
+    #     for game in games:
+    #         game_cats = game.categories.all()
+    #         for cat in game_cats:
+    #             count_dict[cat.name] += freq_dict[str(game)]
+    #     played_dict = {k:v for k,v in count_dict.items() if v != 0}
+    #     total = sum(played_dict.values())
+    #     sorted_cats = sorted(played_dict, key=played_dict.__getitem__)
+    #     perc_left = 100
+    #     perc_added = 0
+    #     final_list = []
+    #     for category in reversed(sorted_cats):
+    #         percentage = round((played_dict[category]/total)*100, 2)
+    #         if len(final_list) > 8:
+    #             if percentage < perc_left:
+    #                 final_list.append(
+    #                     {
+    #                         'name': 'Other',
+    #                         'percentage': perc_left
+    #                     }
+    #                 )
+    #                 break
+    #         perc_left -= percentage
+    #         perc_added += percentage
+    #         if perc_added > 100:
+    #             percentage -= (perc_added - 100)
+    #         final_list.append(
+    #             {
+    #                 'name': category,
+    #                 'games_played': played_dict[category],
+    #                 'percentage': round(percentage, 2)
+    #             }
+    #         )
+    #     return final_list
 
 
 class DjoserRegistrationSerializer(UserCreatePasswordRetypeSerializer):
