@@ -398,6 +398,8 @@ class RSVPListCreateView(ListCreateAPIView):
         gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
         if not RSVP.objects.filter(gamenight=gamenight, invitee=contact).exists():
             serializer.save(gamenight=gamenight, invitee=contact)
+            if self.request.data['attending']:
+                gamenight.update_attendees(contact.pk)
             return True
         return False
 
