@@ -143,6 +143,7 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
 
 class ContactForGameNightSerializer(serializers.ModelSerializer):
     favorite_games = serializers.SerializerMethodField()
+    attendance_rate = serializers.SerializerMethodField()
 
     class Meta:
         model = Contact
@@ -152,6 +153,7 @@ class ContactForGameNightSerializer(serializers.ModelSerializer):
             'last_name',
             'email',
             'favorite_games',
+            'attendance_rate',
         )
 
     def get_favorite_games(self, obj):
@@ -184,6 +186,11 @@ class ContactForGameNightSerializer(serializers.ModelSerializer):
                     'avg_feedback': fback_games_dict[game]
                 }
             )
+
+    def get_attandance_rate(self, obj):
+        attended = len(obj.attended.all())
+        invited = len(obj.invited.all())
+        return round((attended/invited)*100, 2)
 
 
 class GameNightSerializer(serializers.ModelSerializer):
