@@ -160,34 +160,49 @@ class ContactForGameNightSerializer(serializers.ModelSerializer):
         votes = obj.voting.all()
         gamefbacks = obj.gamefeedback.all()
         voted_games_dict = {}
-        fback_games_dict = {}
+        fback_total_dict = {}
+        fback_count_dict = {}
+        fback_avg_dict = {}
+        game_dict = {}
         for fback in gamefbacks:
             game = fback.game
-            if game.title in fback_games_dict:
-                fback_games_dict[game.title] += 1
+            if game.title in fback_total_dict and game.title in fback_count_dict:
+                fback_total_dict[game.title] += fback.rating
             else:
-                fback_games_dict[game.title] = 1
+                fback_total_dict[game.title] = fback.rating
+            if game.title in fback_count_dict:
+                fback_count_dict[game.title] += 1
+            else:
+                fback_count_dict[game.title] = 1
+            if game.title not in game_dict:
+                game_dict[game.title] = game
+        for game in fback_total_dict.keys():
+            fback_avg_dict[game] = fback_total_dict[game]/fback_count_dict[game]
         for vote in votes:
             game = vote.game
-            if game.title in fback_games_dict:
-                voted_games_dict[game.title] += 1
+            if game.title in voted_games_dict:
+                voted_games_dict[game.title] += vote.vote
             else:
-                voted_games_dict[game.title] = 1
-        fback_sort = sorted(fback_games_dict, key=fback_games_dict.__getitem__)
+                voted_games_dict[game.title] = vote.vote
+        fback_sort = sorted(fback_avg_dict, key=fback_avg_dict.__getitem__)
         final_list = []
         for game in reversed(fback_sort):
-            game_obj = gamefbacks.filter(title=game)[0]
+            game_obj = game_dict[game]
             final_list.append(
                 {
                     'title': game,
                     'bgg': game_obj.bgg,
                     'pub_year': game_obj.pub_year,
                     'image': game_obj.image,
-                    'avg_feedback': fback_games_dict[game]
+                    'avg_feedback': fback_avg_dict[game],
+                    'accum_votes': voted_games_dict[game]
                 }
             )
+            if len(final_list) == 5:
+                break
+        return final_list
 
-    def get_attandance_rate(self, obj):
+    def get_attendance_rate(self, obj):
         attended = len(obj.attended.all())
         invited = len(obj.invited.all())
         return round((attended/invited)*100, 2)
@@ -197,7 +212,7 @@ class GameNightSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer(read_only=True)
     invitees = serializers.SerializerMethodField()
     rsvps = RSVPForGameNightSerializer(many=True)
-    attendees = ContactSerializer(many=True)
+    attendees = ContactForGameNightSerializer(many=True)
     games = GameListSerializer(read_only=True, many=True)
     options = GameForGameNightSerializer(read_only=True, many=True)
     # feedback = serializers.SerializerMethodField()
