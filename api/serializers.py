@@ -221,7 +221,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
     gamenights_finished = serializers.SerializerMethodField()
     weekday_stats = serializers.SerializerMethodField()
     most_common_players = serializers.SerializerMethodField()
-    most_played_games = serializers.SerializerMethodField()
+    # most_played_games = serializers.SerializerMethodField()
     least_played_games = serializers.SerializerMethodField()
     games_not_played = serializers.SerializerMethodField()
     highest_rated_games = serializers.SerializerMethodField()
@@ -240,7 +240,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             'gamenights_finished',
             'weekday_stats',
             'most_common_players',
-            'most_played_games',
+            # 'most_played_games',
             'least_played_games',
             'games_not_played',
             'highest_rated_games',
@@ -438,44 +438,44 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     break
         return return_list
 
-    def get_most_played_games(self, obj):
-        games = obj.games.all()
-        freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
-        played_dict = {k:v for k,v in freq_dict.items() if v != 0}
-        for game in games_sort.copy():
-            if game not in played_dict:
-                games_sort.remove(game)
-        total = sum(played_dict.values())
-        perc_left = 100
-        perc_added = 0
-        final_list = []
-        for game in reversed(games_sort):
-            percentage = round((played_dict[game]/total)*100, 2)
-            if len(final_list) > 8:
-                if percentage < perc_left:
-                    final_list.append(
-                        {
-                            'title': 'Other',
-                            'percentage': perc_left
-                        }
-                    )
-                    break
-            perc_left -= percentage
-            perc_added += percentage
-            game_data = other_data[game]
-            if perc_added > 100:
-                percentage -= (perc_added - 100)
-            final_list.append(
-                {
-                    'title': game,
-                    'bgg': game_data['bgg'],
-                    'pub_year': game_data['pub_year'],
-                    'image': game_data['image'],
-                    'played': played_dict[game],
-                    'percentage': percentage
-                }
-            )
-        return final_list
+    # def get_most_played_games(self, obj):
+    #     games = obj.games.all()
+    #     freq_dict, other_data, games_sort = self.sort_games_by_play_num(games)
+    #     played_dict = {k:v for k,v in freq_dict.items() if v != 0}
+    #     for game in games_sort.copy():
+    #         if game not in played_dict:
+    #             games_sort.remove(game)
+    #     total = sum(played_dict.values())
+    #     perc_left = 100
+    #     perc_added = 0
+    #     final_list = []
+    #     for game in reversed(games_sort):
+    #         percentage = round((played_dict[game]/total)*100, 2)
+    #         if len(final_list) > 8:
+    #             if percentage < perc_left:
+    #                 final_list.append(
+    #                     {
+    #                         'title': 'Other',
+    #                         'percentage': perc_left
+    #                     }
+    #                 )
+    #                 break
+    #         perc_left -= percentage
+    #         perc_added += percentage
+    #         game_data = other_data[game]
+    #         if perc_added > 100:
+    #             percentage -= (perc_added - 100)
+    #         final_list.append(
+    #             {
+    #                 'title': game,
+    #                 'bgg': game_data['bgg'],
+    #                 'pub_year': game_data['pub_year'],
+    #                 'image': game_data['image'],
+    #                 'played': played_dict[game],
+    #                 'percentage': percentage
+    #             }
+    #         )
+    #     return final_list
 
     def get_least_played_games(self, obj):
         return_list = []
