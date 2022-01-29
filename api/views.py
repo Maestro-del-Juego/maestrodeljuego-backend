@@ -167,6 +167,8 @@ class GameNightView(ListCreateAPIView):
     def perform_create(self, serializer):
         rand_id = self.get_rid()
         serializer.save(user=self.request.user, rid=rand_id)
+        gamenight = GameNight.objects.get(rid=rand_id)
+        gamenight.mail_gamenight_create()
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -230,6 +232,7 @@ class GameNightDetailView(RetrieveUpdateAPIView):
                 pk = contact['pk']
                 gamenight.update_invitees(pk)
                 gamenight.save()
+
         elif 'options' in data:
             games = data['options']
             for game in games:
@@ -310,8 +313,10 @@ class GeneralFeedbackView(CreateAPIView):
         attendee_pk = self.request.data['attendee']
         contact = Contact.objects.get(pk=attendee_pk)
         gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
+
         if not GeneralFeedback.objects.filter(gamenight=gamenight, attendee=contact).exists():
             serializer.save(gamenight=gamenight, attendee=contact)
+
             return True
         return False
 
@@ -320,6 +325,7 @@ class GeneralFeedbackView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         saved = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+        
         if saved:
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         not_saved = {'detail': 'Attendee has already left feedback.'}
@@ -357,6 +363,7 @@ class GameFeedbackView(CreateAPIView):
             serializer.save(gamenight=gamenight, attendee=contact)
             return True
         return False
+
 
     def create(self, request, *args, **kwargs):
         if len(request.data) == 0:
@@ -410,3 +417,4 @@ class RSVPListCreateView(ListCreateAPIView):
         return Response(not_saved, status=status.HTTP_418_IM_A_TEAPOT, headers=headers)
 
 
+        

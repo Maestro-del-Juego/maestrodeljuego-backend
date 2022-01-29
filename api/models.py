@@ -1,7 +1,10 @@
 from telnetlib import STATUS
+from time import strftime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.mail import send_mail
+from games import settings
 from datetime import datetime, timedelta
 
 
@@ -44,6 +47,42 @@ class GameNight(models.Model):
 
     def __str__(self):
         return f"{self.rid}"
+    
+    def mail_gamenight_create(self):
+        invitees_list = self.invitees.all()
+        email_list = []
+        for invitee in invitees_list:           
+            email_list.append(invitee.email)
+        send_mail(
+            subject=( f'Game night! {self.date.strftime("%b %d")} at {self.start_time.strftime("%I:%M %p")}.  Be there!'),
+            message=( f'Please join us on {self.date.strftime("%b %d")} for super duper fun at {self.location}. Lets get started at {self.start_time.strftime("%I:%M %p")}  Click the url for details!  https://game-master.netlify.app/game_night/{self.rid}/'),
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=email_list
+            )
+
+#method goes on GameNightDetailView at end of elif 'invitees' in data...
+#not sure how to get updated invitees 
+    def mail_update_invitees(self, new_emails):
+
+        send_mail(
+            subject=( f'Game night! {self.date.strftime("%b %d")} at {self.start_time.strftime("%I:%M %p")}.  Be there!'),
+            message=( f'Please join us on {self.date.strftime("%b %d")} for super duper fun at {self.location}. Lets get started at {self.start_time.strftime("%I:%M %p")}  Click the url for details!  https://game-master.netlify.app/game_night/{self.rid}/'),
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=new_emails
+            )
+
+#not sure where to put this method
+    def mail_finalized(self):
+        attendees_list = self.attendees.all()
+        email_list = []
+        for attendee in attendees_list:           
+            email_list.append(attendee.email)
+        send_mail(
+            subject=( f'We are all set for game night on {self.date.strftime("%b %d")} at {self.start_time.strftime("%I:%M %p")}.'),
+            message=( f'We are excited to see you on {self.date.strftime("%b %d")} at {self.location}. Lets get started at {self.start_time.strftime("%I:%M %p")}.  Click the url again for details!  https://game-master.netlify.app/game_night/{self.rid}/  See you there!'),
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=email_list
+            )
 
     def update_attendees(self, contact_pk):
         attendees_list = self.attendees
@@ -63,6 +102,7 @@ class GameNight(models.Model):
                 self.attendees.remove(contact)
         else:
             invitees_list.add(contact)
+            self.mail_update_invitees([contact.email])
 
     def update_options(self, game_pk):
         options_list = self.options
@@ -163,6 +203,19 @@ class GeneralFeedback(models.Model):
 
     def __str__(self):
         return f"GeneralFeedback from {self.attendee.first_name} {self.attendee.last_name}"
+# In this model it's attendee, in GameNight it's attendees
+    def mail_feedback(self):
+        attendees_list = self.attendee.all()
+        email_list = []
+        for attendee in attendees_list:           
+            email_list.append(attendee.email)
+        send_mail(
+            subject=( f'We hope you had fun at game night on {self.date.strftime("%b %d")}. Let us know!'),
+            message=( f'We hope you had fun at game night on {self.date.strftime("%b %d")}   Click the url for to fill out a form telling us how much!  https://game-master.netlify.app/game_night/{self.rid}/feedback/'),
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=email_list
+            )
+
 
 
 class Contact(models.Model):
