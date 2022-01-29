@@ -185,6 +185,8 @@ class Contact(models.Model):
     def attend_percent(self):
         attended = len(self.attended.all())
         invited = len(self.invited.all())
+        if invited == 0:
+            return 0
         return round((attended/invited)*100, 2)
 
     def fav_games(self):
