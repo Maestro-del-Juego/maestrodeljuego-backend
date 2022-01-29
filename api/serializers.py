@@ -214,7 +214,9 @@ class GameNightSerializer(serializers.ModelSerializer):
                     'pk': contact.pk,
                     'first_name': contact.first_name,
                     'last_name': contact.last_name,
-                    'email': contact.email
+                    'email': contact.email,
+                    'favorite_games': contact.fav_games(),
+                    'attendance_rate': contact.attend_percent()
                 }
             )
         return inv_list
