@@ -18,6 +18,7 @@ xmltodict = "*"
 beautifulsoup4 = "*"
 drf-writable-nested = "*"
 celery = "*"
+redis = "*"
 
 [dev-packages]
 
