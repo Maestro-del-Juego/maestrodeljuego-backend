@@ -74,14 +74,25 @@ class GameDetailSerializer(serializers.ModelSerializer):
 
 
 class ContactSerializer(serializers.ModelSerializer):
+    attendance_rate = serializers.SerializerMethodField()
+    favorite_games = serializers.SerializerMethodField()
+
     class Meta:
         model = Contact
         fields = (
             'pk',
             'first_name',
             'last_name',
-            'email'
+            'email',
+            'attendance_rate',
+            'favorite_games',
         )
+
+    def get_attendance_rate(self, obj):
+        return obj.attend_percent()
+
+    def get_favorite_games(self, obj):
+        return obj.fav_games()
 
 
 class RSVPSerializer(serializers.ModelSerializer):
