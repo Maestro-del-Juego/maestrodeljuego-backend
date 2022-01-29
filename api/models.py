@@ -199,10 +199,11 @@ class Contact(models.Model):
         game_dict = {}
         for fback in gamefbacks:
             game = fback.game
-            if game.title in fback_total_dict and game.title in fback_count_dict:
+            if game.title in fback_total_dict:
                 fback_total_dict[game.title] += fback.rating
             else:
                 fback_total_dict[game.title] = fback.rating
+                voted_games_dict[game.title] = 0
             if game.title in fback_count_dict:
                 fback_count_dict[game.title] += 1
             else:
