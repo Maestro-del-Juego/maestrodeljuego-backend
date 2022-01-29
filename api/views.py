@@ -366,6 +366,9 @@ class GameFeedbackView(CreateAPIView):
 
 
     def create(self, request, *args, **kwargs):
+        if len(request.data) == 0:
+            response = {'detail': 'Nothing to save here.'}
+            return Response(response, status=status.HTTP_204_NO_CONTENT, headers=self.default_response_headers)
         serializer = self.get_serializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
         saved = self.perform_create(serializer)

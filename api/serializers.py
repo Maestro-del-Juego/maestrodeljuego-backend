@@ -74,14 +74,25 @@ class GameDetailSerializer(serializers.ModelSerializer):
 
 
 class ContactSerializer(serializers.ModelSerializer):
+    attendance_rate = serializers.SerializerMethodField()
+    favorite_games = serializers.SerializerMethodField()
+
     class Meta:
         model = Contact
         fields = (
             'pk',
             'first_name',
             'last_name',
-            'email'
+            'email',
+            'attendance_rate',
+            'favorite_games',
         )
+
+    def get_attendance_rate(self, obj):
+        return obj.attend_percent()
+
+    def get_favorite_games(self, obj):
+        return obj.fav_games()
 
 
 class RSVPSerializer(serializers.ModelSerializer):
@@ -108,6 +119,7 @@ class RSVPForGameNightSerializer(serializers.ModelSerializer):
 
 
 class GameForGameNightSerializer(serializers.ModelSerializer):
+    categories = serializers.StringRelatedField(many=True)
     votes = serializers.SerializerMethodField()
     # feedback = serializers.SerializerMethodField()
 
@@ -119,6 +131,10 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
             'title',
             'pub_year',
             'image',
+            'playtime',
+            'min_players',
+            'max_players',
+            'categories',
             'votes',
             # 'feedback',
         )
@@ -141,12 +157,34 @@ class GameForGameNightSerializer(serializers.ModelSerializer):
     #     return rating
 
 
+class ContactForGameNightSerializer(serializers.ModelSerializer):
+    favorite_games = serializers.SerializerMethodField()
+    attendance_rate = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Contact
+        fields = (
+            'pk',
+            'first_name',
+            'last_name',
+            'email',
+            'favorite_games',
+            'attendance_rate',
+        )
+
+    def get_favorite_games(self, obj):
+        return obj.fav_games()
+
+    def get_attendance_rate(self, obj):
+        return obj.attend_percent()
+
+
 class GameNightSerializer(serializers.ModelSerializer):
     user = UserNestedSerializer(read_only=True)
     invitees = serializers.SerializerMethodField()
     rsvps = RSVPForGameNightSerializer(many=True)
-    attendees = ContactSerializer(many=True)
-    games = GameListSerializer(read_only=True, many=True)
+    attendees = ContactForGameNightSerializer(many=True)
+    games = GameForGameNightSerializer(read_only=True, many=True)
     options = GameForGameNightSerializer(read_only=True, many=True)
     # feedback = serializers.SerializerMethodField()
 
@@ -187,7 +225,9 @@ class GameNightSerializer(serializers.ModelSerializer):
                     'pk': contact.pk,
                     'first_name': contact.first_name,
                     'last_name': contact.last_name,
-                    'email': contact.email
+                    'email': contact.email,
+                    'favorite_games': contact.fav_games(),
+                    'attendance_rate': contact.attend_percent()
                 }
             )
         return inv_list
@@ -456,7 +496,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     final_list.append(
                         {
                             'title': 'Other',
-                            'percentage': perc_left
+                            'percentage': round(perc_left, 2)
                         }
                     )
                     break
@@ -472,7 +512,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     'pub_year': game_data['pub_year'],
                     'image': game_data['image'],
                     'played': played_dict[game],
-                    'percentage': percentage
+                    'percentage': round(percentage, 2)
                 }
             )
         return final_list
@@ -643,7 +683,7 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     final_list.append(
                         {
                             'name': 'Other',
-                            'percentage': perc_left
+                            'percentage': round(perc_left, 2)
                         }
                     )
                     break

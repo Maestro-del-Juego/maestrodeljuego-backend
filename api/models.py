@@ -235,6 +235,60 @@ class Contact(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+    def attend_percent(self):
+        attended = len(self.attended.all())
+        invited = len(self.invited.all())
+        if invited == 0:
+            return 0
+        return round((attended/invited)*100, 2)
+
+    def fav_games(self):
+        votes = self.voting.all()
+        gamefbacks = self.gamefeedback.all()
+        voted_games_dict = {}
+        fback_total_dict = {}
+        fback_count_dict = {}
+        fback_avg_dict = {}
+        game_dict = {}
+        for fback in gamefbacks:
+            game = fback.game
+            if game.title in fback_total_dict:
+                fback_total_dict[game.title] += fback.rating
+            else:
+                fback_total_dict[game.title] = fback.rating
+                voted_games_dict[game.title] = 0
+            if game.title in fback_count_dict:
+                fback_count_dict[game.title] += 1
+            else:
+                fback_count_dict[game.title] = 1
+            if game.title not in game_dict:
+                game_dict[game.title] = game
+        for game in fback_total_dict.keys():
+            fback_avg_dict[game] = fback_total_dict[game]/fback_count_dict[game]
+        for vote in votes:
+            game = vote.game
+            if game.title in voted_games_dict:
+                voted_games_dict[game.title] += vote.vote
+            else:
+                voted_games_dict[game.title] = vote.vote
+        fback_sort = sorted(fback_avg_dict, key=fback_avg_dict.__getitem__)
+        final_list = []
+        for game in reversed(fback_sort):
+            game_obj = game_dict[game]
+            final_list.append(
+                {
+                    'title': game,
+                    'bgg': game_obj.bgg,
+                    'pub_year': game_obj.pub_year,
+                    'image': game_obj.image,
+                    'avg_feedback': fback_avg_dict[game],
+                    'accum_votes': voted_games_dict[game]
+                }
+            )
+            if len(final_list) == 5:
+                break
+        return final_list
+
 
 class Voting(models.Model):
     class Meta:
@@ -265,7 +319,7 @@ class GameFeedback(models.Model):
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True)
 
     def __repr__(self):
-        return f"<GameFeedback {self.game.title} by {self.feedback.attendee.first_name} {self.feedback.attendee.last_name}>"
+        return f"<GameFeedback {self.game.title} by {self.attendee.first_name} {self.attendee.last_name}>"
 
     def __str__(self):
         return {self.feedback}
