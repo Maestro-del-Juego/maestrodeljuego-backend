@@ -182,6 +182,11 @@ class Contact(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+    def attend_percent(self):
+        attended = len(self.attended.all())
+        invited = len(self.invited.all())
+        return round((attended/invited)*100, 2)
+
 
 class Voting(models.Model):
     class Meta:

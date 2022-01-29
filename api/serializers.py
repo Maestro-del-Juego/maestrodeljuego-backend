@@ -208,9 +208,7 @@ class ContactForGameNightSerializer(serializers.ModelSerializer):
         return final_list
 
     def get_attendance_rate(self, obj):
-        attended = len(obj.attended.all())
-        invited = len(obj.invited.all())
-        return round((attended/invited)*100, 2)
+        return obj.attend_percent()
 
 
 class GameNightSerializer(serializers.ModelSerializer):
