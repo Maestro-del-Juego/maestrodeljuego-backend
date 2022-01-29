@@ -108,6 +108,7 @@ class RSVPForGameNightSerializer(serializers.ModelSerializer):
 
 
 class GameForGameNightSerializer(serializers.ModelSerializer):
+    categories = serializers.StringRelatedField(many=True)
     votes = serializers.SerializerMethodField()
     # feedback = serializers.SerializerMethodField()
 
