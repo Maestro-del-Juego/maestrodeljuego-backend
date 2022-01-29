@@ -17,6 +17,7 @@ bpython = "*"
 xmltodict = "*"
 beautifulsoup4 = "*"
 drf-writable-nested = "*"
+celery = "*"
 
 [dev-packages]
 
