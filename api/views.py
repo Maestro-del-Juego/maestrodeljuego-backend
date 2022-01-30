@@ -11,7 +11,8 @@ from datetime import date, datetime, timedelta
 from rest_framework import status
 from rest_framework.response import Response
 from .tasks import test_email
-
+from celery.app.control import Control
+from celery.result import AsyncResult
 from api import serializers
 
 
@@ -160,6 +161,11 @@ class GameNightView(ListCreateAPIView):
     serializer_class = GameNightSerializer
     # permission_classes = [IsAuthorOrReadOnly]
 
+    def list(self, request, *args, **kwargs):
+        result = AsyncResult(id='9e1890b6-354b-45d3-910c-b2ca0eb52e3b')
+        result.revoke()
+        return super().list(request, *args, **kwargs)
+
     def get_queryset(self):
         user = self.request.user
         queryset = user.gamenights.all()
@@ -210,10 +216,13 @@ class GameNightDetailView(RetrieveUpdateAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         dtime = datetime.now()
-        tdelta = timedelta(minutes=2)
+        tdelta = timedelta(minutes=10)
         task = test_email.apply_async(kwargs={'dt': dtime+tdelta}, eta=dtime+tdelta, retry=True)
-        breakpoint()
-        return super().retrieve(request, *args, **kwargs)
+        instance = self.get_object()
+        instance.feedback_task = task.id
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     def get_object(self):
         '''
