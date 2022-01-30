@@ -7,9 +7,10 @@ from .models import Game, GameNight, Tag, Category, Contact, Voting, GeneralFeed
 from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingSerializer, GameNightCreateSerializer, GeneralFeedbackSerializer, GameFeedbackSerializer, RSVPSerializer
 from .permissions import IsAuthorOrReadOnly
 import requests, json, xmltodict, decimal, string, random
-from datetime import date
+from datetime import date, datetime, timedelta
 from rest_framework import status
 from rest_framework.response import Response
+from .tasks import test_email
 
 from api import serializers
 
@@ -206,6 +207,13 @@ class GameNightDetailView(RetrieveUpdateAPIView):
     #     user = self.request.user
     #     queryset = user.gamenights.all()
     #     return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        dtime = datetime.now()
+        tdelta = timedelta(minutes=2)
+        task = test_email.apply_async(kwargs={'dt': dtime+tdelta}, eta=dtime+tdelta, retry=True)
+        breakpoint()
+        return super().retrieve(request, *args, **kwargs)
 
     def get_object(self):
         '''
