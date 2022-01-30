@@ -38,6 +38,7 @@ class GameNight(models.Model):
     end_time = models.TimeField(null=True)
     location = models.CharField(max_length=300)
     options = models.ManyToManyField('Game', related_name='options', blank=True)
+    feedback_task = models.CharField(max_length=50, null=True, blank=True)
 
     def __repr__(self):
         return f"<GameNight rid:{self.rid}>"
