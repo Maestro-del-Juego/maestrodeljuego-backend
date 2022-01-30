@@ -170,7 +170,7 @@ class GameNight(models.Model):
         gn_date = self.date
         fback_datetime = datetime(gn_date.year, gn_date.month, gn_date.day+1, 12)
         subject = 'Your Feedback is Requested!'
-        message = f"Thank you so much for attending my GameKnight! Please follow the link below to complete a short feedback survey: https://game-knight.netlify.app/game_night/{self.rid}/"
+        message = f"Thank you so much for attending my GameKnight! Please follow the link below to complete a short feedback survey: https://game-knight.netlify.app/game_night/{self.rid}/feedback"
         email_list = []
         for contact in self.attendees.all():
             email_list.append(contact.email)
