@@ -15,3 +15,12 @@ def test_email(dt):
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=email_list
     )
+
+@app.task
+def feedback_email(subject, message, email_list):
+    send_mail(
+        subject=subject,
+        message=message,
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=email_list
+    )
