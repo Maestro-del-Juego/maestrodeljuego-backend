@@ -408,14 +408,22 @@ class Game(models.Model):
 
         return votes
 
-    def calc_feedback(self, gamenight):
-        ballots = GameFeedback.objects.filter(game=self, gamenight=gamenight)
-        if len(ballots) == 0:
-            return None
+    def calc_feedback(self, user):
         total = 0
-        for ballot in ballots:
-            total += ballot.rating
-        average = total/len(ballots)
+        count = 0
+        gamenights = self.gamenights.filter(user=user)
+        if len(gamenights) == 0:
+            return None
+        for gamenight in gamenights:
+            ballots = GameFeedback.objects.filter(game=self, gamenight=gamenight)
+            if len(ballots) == 0:
+                continue
+            for ballot in ballots:
+                total += ballot.rating
+                count += 1
+        if count == 0:
+            return None
+        average = total/count
         return round(average, 2)
 
 
