@@ -40,6 +40,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
     owned = serializers.SerializerMethodField()
     wishlisted = serializers.SerializerMethodField()
     categories = serializers.StringRelatedField(many=True)
+    avg_feedback = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
@@ -54,6 +55,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
             'playtime',
             'player_age',
             'categories',
+            'avg_feedback',
             'owned',
             'wishlisted'
         )
@@ -71,6 +73,12 @@ class GameDetailSerializer(serializers.ModelSerializer):
         if user in wishers:
             return True
         return False
+
+    def get_avg_feedback(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return obj.calc_feedback(user)
+        return None
 
 
 class ContactSerializer(serializers.ModelSerializer):
