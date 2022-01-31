@@ -640,17 +640,10 @@ class DjoserUserSerializer(serializers.ModelSerializer):
         rating_dict = {}
         final_list = []
         for game in games:
-            all_gamenights = game.gamenights.all()
-            gamenights = all_gamenights.filter(user=obj)
-            total = 0
-            for gamenight in gamenights:
-                fback = game.calc_feedback(gamenight)
-                if fback is None:
-                    continue
-                total += fback
-            if total == 0:
+            avg_rating = game.calc_feedback(obj)
+            if avg_rating is None:
                 continue
-            rating_dict[str(game)] = round(total/len(gamenights), 2)
+            rating_dict[str(game)] = avg_rating
             other_data[str(game)] = {
                 'bgg': game.bgg,
                 'pub_year': game.pub_year,
