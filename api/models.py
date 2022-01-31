@@ -95,6 +95,7 @@ class GameNight(models.Model):
                 attendees_list.remove(contact)
             else:
                 attendees_list.add(contact)
+        self.update_feedback_task()
 
     def update_invitees(self, contact_pk):
         invitees_list = self.invitees
@@ -188,7 +189,8 @@ class GameNight(models.Model):
     def update_feedback_task(self):
         result = AsyncResult(id=self.feedback_task)
         result.revoke()
-        self.schedule_feedback_task()
+        if self.status == 'Finalized':
+            self.schedule_feedback_task()
 
 
 class Tag(models.Model):
