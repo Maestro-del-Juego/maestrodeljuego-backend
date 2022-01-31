@@ -237,6 +237,7 @@ class GameNightDetailView(RetrieveUpdateAPIView):
     def perform_update(self, serializer):
         gamenight = self.get_object()
         data = self.request.data
+
         if 'attendees' in data:
             contacts = data['attendees']
             for contact in contacts:
@@ -249,7 +250,6 @@ class GameNightDetailView(RetrieveUpdateAPIView):
                 pk = contact['pk']
                 gamenight.update_invitees(pk)
                 gamenight.save()
-
         elif 'options' in data:
             games = data['options']
             for game in games:
@@ -262,6 +262,13 @@ class GameNightDetailView(RetrieveUpdateAPIView):
                 pk = game['pk']
                 gamenight.update_games(pk)
                 gamenight.save()
+
+        task_update_fields = {'status': gamenight.status, 'date': gamenight.date}
+        for field in task_update_fields.keys():
+            if field in data:
+                if data[field] != task_update_fields[field]:
+                    gamenight.update_feedback_task()
+
         serializer.save()
 
 
