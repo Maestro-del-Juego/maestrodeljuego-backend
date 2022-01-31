@@ -40,6 +40,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
     owned = serializers.SerializerMethodField()
     wishlisted = serializers.SerializerMethodField()
     categories = serializers.StringRelatedField(many=True)
+    avg_feedback = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
@@ -54,6 +55,7 @@ class GameDetailSerializer(serializers.ModelSerializer):
             'playtime',
             'player_age',
             'categories',
+            'avg_feedback',
             'owned',
             'wishlisted'
         )
@@ -71,6 +73,12 @@ class GameDetailSerializer(serializers.ModelSerializer):
         if user in wishers:
             return True
         return False
+
+    def get_avg_feedback(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return obj.calc_feedback(user)
+        return None
 
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -186,6 +194,7 @@ class GameNightSerializer(serializers.ModelSerializer):
     attendees = ContactForGameNightSerializer(many=True)
     games = GameForGameNightSerializer(read_only=True, many=True)
     options = GameForGameNightSerializer(read_only=True, many=True)
+    comments = serializers.SerializerMethodField()
     # feedback = serializers.SerializerMethodField()
 
     class Meta:
@@ -204,6 +213,7 @@ class GameNightSerializer(serializers.ModelSerializer):
             'end_time',
             'location',
             'options',
+            'comments',
             # 'feedback',
         )
 
@@ -231,6 +241,24 @@ class GameNightSerializer(serializers.ModelSerializer):
                 }
             )
         return inv_list
+
+    def get_comments(self, obj):
+        fbacks = obj.generalfeedback.all()
+        comments = []
+        for fback in fbacks:
+            if fback.comments != '':
+                contact = fback.attendee
+                name = f"{contact.first_name} {contact.last_name}"
+                comments.append(
+                    {
+                        'attendee': {
+                            'pk': contact.pk,
+                            'name': name
+                        },
+                        'comment': fback.comments
+                    }
+                )
+        return comments
 
 
 class GameNightCreateSerializer(serializers.ModelSerializer):
