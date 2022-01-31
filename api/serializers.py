@@ -186,6 +186,7 @@ class GameNightSerializer(serializers.ModelSerializer):
     attendees = ContactForGameNightSerializer(many=True)
     games = GameForGameNightSerializer(read_only=True, many=True)
     options = GameForGameNightSerializer(read_only=True, many=True)
+    comments = serializers.SerializerMethodField()
     # feedback = serializers.SerializerMethodField()
 
     class Meta:
@@ -204,6 +205,7 @@ class GameNightSerializer(serializers.ModelSerializer):
             'end_time',
             'location',
             'options',
+            'comments',
             # 'feedback',
         )
 
@@ -231,6 +233,24 @@ class GameNightSerializer(serializers.ModelSerializer):
                 }
             )
         return inv_list
+
+    def get_comments(self, obj):
+        fbacks = obj.generalfeedback.all()
+        comments = []
+        for fback in fbacks:
+            if fback.comments != '':
+                contact = fback.attendee
+                name = f"{contact.first_name} {contact.last_name}"
+                comments.append(
+                    {
+                        'attendee': {
+                            'pk': contact.pk,
+                            'name': name
+                        },
+                        'comment': fback.comments
+                    }
+                )
+        return comments
 
 
 class GameNightCreateSerializer(serializers.ModelSerializer):
