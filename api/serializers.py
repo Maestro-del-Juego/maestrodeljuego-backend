@@ -10,6 +10,7 @@ import random
 
 class GameListSerializer(serializers.ModelSerializer):
     categories = serializers.StringRelatedField(many=True)
+    avg_feedback = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
@@ -23,7 +24,14 @@ class GameListSerializer(serializers.ModelSerializer):
             'min_players',
             'max_players',
             'categories',
+            'avg_feedback',
         )
+
+    def get_avg_feedback(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return obj.calc_feedback(user)
+        return None
 
 
 class UserNestedSerializer(serializers.ModelSerializer):
