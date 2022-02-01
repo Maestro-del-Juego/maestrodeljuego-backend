@@ -407,7 +407,8 @@ class RSVPListCreateView(ListCreateAPIView):
         contact = Contact.objects.get(
             first_name=invitee['first_name'],
             last_name=invitee['last_name'],
-            email=invitee['email']
+            email=invitee['email'],
+            user=self.request.user
         )
         gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
         if not RSVP.objects.filter(gamenight=gamenight, invitee=contact).exists():
