@@ -2,8 +2,7 @@ from datetime import datetime, date
 from celery import Celery
 from django.core.mail import send_mail
 from games import settings
-
-app = Celery('games', broker='redis://localhost')
+from games.celery import app
 
 @app.task
 def test_email(dt):
