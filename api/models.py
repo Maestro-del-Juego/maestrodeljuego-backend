@@ -233,19 +233,6 @@ class GeneralFeedback(models.Model):
 
     def __str__(self):
         return f"GeneralFeedback from {self.attendee.first_name} {self.attendee.last_name}"
-# In this model it's attendee, in GameNight it's attendees
-    def mail_feedback(self):
-        attendees_list = self.attendee.all()
-        email_list = []
-        for attendee in attendees_list:           
-            email_list.append(attendee.email)
-        send_mail(
-            subject=( f'We hope you had fun at game night on {self.date.strftime("%b %d")}. Let us know!'),
-            message=( f'We hope you had fun at game night on {self.date.strftime("%b %d")}   Click the url for to fill out a form telling us how much!  https://game-master.netlify.app/game_night/{self.rid}/feedback/'),
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=email_list
-            )
-
 
 
 class Contact(models.Model):
