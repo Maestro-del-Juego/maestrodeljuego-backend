@@ -1,3 +1,7 @@
+# Intro
+
+This API utilizes data the BGG XML API2, courtesy of Board Game Geek. Thanks for letting us use it for this project!
+
 # Installation
 
 ## Prerquisites

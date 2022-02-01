@@ -79,7 +79,8 @@ class GameDetailView(RetrieveUpdateAPIView):
 
 def new_game(bgg):
     '''
-    Takes a BGG ID and returns the associated game object.
+    Takes a BGG ID and returns the associated game object using the BGG XML
+    API2, courtesy of Board Game Geek.
     '''
 
     url = f"https://www.boardgamegeek.com/xmlapi2/thing?id={bgg}&stats=1"
