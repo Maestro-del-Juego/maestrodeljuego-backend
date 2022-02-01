@@ -415,6 +415,13 @@ class Game(models.Model):
         average = total/count
         return round(average, 2)
 
+    def get_categories(self):
+        categories = self.categories.all()
+        str_list = []
+        for cat in categories:
+            str_list.append(str(cat))
+        return str_list
+
 
 class RSVP(models.Model):
     class Meta:

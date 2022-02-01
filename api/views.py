@@ -403,13 +403,17 @@ class RSVPListCreateView(ListCreateAPIView):
         return queryset
 
     def perform_create(self, serializer):
+        gamenight_rid = self.kwargs['rid']
+        gamenight = get_object_or_404(GameNight, rid=gamenight_rid)
+        user = gamenight.user
         invitee = self.request.data['invitee']
-        contact = Contact.objects.get(
+        contact = get_object_or_404(
+            Contact,
             first_name=invitee['first_name'],
             last_name=invitee['last_name'],
-            email=invitee['email']
+            email=invitee['email'],
+            user=user
         )
-        gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
         if not RSVP.objects.filter(gamenight=gamenight, invitee=contact).exists():
             serializer.save(gamenight=gamenight, invitee=contact)
             if self.request.data['attending'] == 'True':
