@@ -574,7 +574,8 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                         'pub_year': game_data['pub_year'],
                         'image': game_data['image'],
                         'last_played': str(most_recent),
-                        'played': freq_dict[game]
+                        'played': freq_dict[game],
+                        'categories': game_data['categories']
                     }
                 )
         else:
@@ -599,7 +600,8 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                         'pub_year': game_data['pub_year'],
                         'image': game_data['image'],
                         'last_played': str(most_recent),
-                        'played': freq_dict[name]
+                        'played': freq_dict[name],
+                        'categories': game_data['categories']
                     }
                 )
                 index += 1
@@ -621,7 +623,8 @@ class DjoserUserSerializer(serializers.ModelSerializer):
                     'bgg': game_data['bgg'],
                     'pub_year': game_data['pub_year'],
                     'image': game_data['image'],
-                    'played': freq_dict[game]
+                    'played': freq_dict[game],
+                    'categories': game_data['categories']
                 }
             )
         if len(final_list) < 6:
@@ -637,7 +640,8 @@ class DjoserUserSerializer(serializers.ModelSerializer):
             other_data_dict[str(game)] = {
                 'bgg': game.bgg,
                 'pub_year': game.pub_year,
-                'image': game.image
+                'image': game.image,
+                'categories': game.get_categories()
             }
         games_sort = sorted(freq_dict, key=freq_dict.__getitem__)
         return freq_dict, other_data_dict, games_sort
