@@ -192,6 +192,7 @@ class GameNight(models.Model):
             result.revoke()
         if self.status == 'Finalized':
             self.schedule_feedback_task()
+            self.mail_finalized()
 
 
 class Tag(models.Model):
