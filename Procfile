@@ -1,3 +1,3 @@
 web: gunicorn games.wsgi
 release: python manage.py migrate
-worker: celery worker -A games worker --loglevel=INFO
+worker: celery worker --app=games worker --loglevel=INFO
