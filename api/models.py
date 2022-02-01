@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.mail import send_mail
 from games import settings
 from datetime import datetime, timedelta
-from .tasks import test_email
+from .tasks import feedback_email
 from celery.result import AsyncResult
 
 
@@ -171,11 +171,11 @@ class GameNight(models.Model):
         gn_date = self.date
         fback_datetime = datetime(gn_date.year, gn_date.month, gn_date.day+1, 12)
         subject = 'Your Feedback is Requested!'
-        message = f"Thank you so much for attending my GameKnight! Please follow the link below to complete a short feedback survey: https://game-knight.netlify.app/game_night/{self.rid}/feedback"
+        message = f"Thank you so much for attending my GameKnight on {str(gn_date)}! Please follow the link below to complete a short feedback survey: https://game-knight.netlify.app/game_night/{self.rid}/feedback"
         email_list = []
         for contact in self.attendees.all():
             email_list.append(contact.email)
-        task = test_email.apply_async(
+        task = feedback_email.apply_async(
             kwargs={
                 'subject': subject,
                 'message': message,
@@ -187,8 +187,9 @@ class GameNight(models.Model):
         self.save()
 
     def update_feedback_task(self):
-        result = AsyncResult(id=self.feedback_task)
-        result.revoke()
+        if self.feedback_task is not None:
+            result = AsyncResult(id=self.feedback_task)
+            result.revoke()
         if self.status == 'Finalized':
             self.schedule_feedback_task()
 
