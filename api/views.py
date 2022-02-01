@@ -209,15 +209,6 @@ class GameNightDetailView(RetrieveUpdateAPIView):
     #     queryset = user.gamenights.all()
     #     return queryset
 
-    # def retrieve(self, request, *args, **kwargs):
-    #     dtime = datetime.now()
-    #     tdelta = timedelta(minutes=10)
-    #     task = test_email.apply_async(kwargs={'dt': dtime+tdelta}, eta=dtime+tdelta, retry=True)
-    #     instance = self.get_object()
-    #     instance.feedback_task = task.id
-    #     instance.save()
-    #     serializer = self.get_serializer(instance)
-    #     return Response(serializer.data)
 
     def get_object(self):
         '''
