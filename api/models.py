@@ -1,8 +1,13 @@
 from telnetlib import STATUS
+from time import strftime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.mail import send_mail
+from games import settings
 from datetime import datetime, timedelta
+from .tasks import feedback_email
+from celery.result import AsyncResult
 
 
 class CustomUser(AbstractUser):
@@ -45,6 +50,42 @@ class GameNight(models.Model):
 
     def __str__(self):
         return f"{self.rid}"
+    
+    def mail_gamenight_create(self):
+        invitees_list = self.invitees.all()
+        email_list = []
+        for invitee in invitees_list:           
+            email_list.append(invitee.email)
+        send_mail(
+            subject=( f'Game night! {self.date.strftime("%b %d")} at {self.start_time.strftime("%I:%M %p")}.  Be there!'),
+            message=( f'Please join us on {self.date.strftime("%b %d")} for super duper fun at {self.location}. Lets get started at {self.start_time.strftime("%I:%M %p")}  Click the url for details!  https://game-knight.netlify.app/game_night/{self.rid}/'),
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=email_list
+            )
+
+#method goes on GameNightDetailView at end of elif 'invitees' in data...
+#not sure how to get updated invitees 
+    def mail_update_invitees(self, new_emails):
+
+        send_mail(
+            subject=( f'Game night! {self.date.strftime("%b %d")} at {self.start_time.strftime("%I:%M %p")}.  Be there!'),
+            message=( f'Please join us on {self.date.strftime("%b %d")} for super duper fun at {self.location}. Lets get started at {self.start_time.strftime("%I:%M %p")}  Click the url for details!  https://game-knight.netlify.app/game_night/{self.rid}/'),
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=new_emails
+            )
+
+#not sure where to put this method
+    def mail_finalized(self):
+        attendees_list = self.attendees.all()
+        email_list = []
+        for attendee in attendees_list:           
+            email_list.append(attendee.email)
+        send_mail(
+            subject=( f'We are all set for game night on {self.date.strftime("%b %d")} at {self.start_time.strftime("%I:%M %p")}.'),
+            message=( f'We are excited to see you on {self.date.strftime("%b %d")} at {self.location}. Lets get started at {self.start_time.strftime("%I:%M %p")}.  Click the url again for details!  https://game-knight.netlify.app/game_night/{self.rid}/  See you there!'),
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=email_list
+            )
 
     def update_attendees(self, contact_pk):
         attendees_list = self.attendees
@@ -54,6 +95,7 @@ class GameNight(models.Model):
                 attendees_list.remove(contact)
             else:
                 attendees_list.add(contact)
+        self.update_feedback_task()
 
     def update_invitees(self, contact_pk):
         invitees_list = self.invitees
@@ -64,6 +106,7 @@ class GameNight(models.Model):
                 self.attendees.remove(contact)
         else:
             invitees_list.add(contact)
+            self.mail_update_invitees([contact.email])
 
     def update_options(self, game_pk):
         options_list = self.options
@@ -123,6 +166,32 @@ class GameNight(models.Model):
             d2 = datetime(date.year, date.month, date.day, t2.hour, t2.minute)
         delta = d2 - d1
         return delta.total_seconds()/60
+
+    def schedule_feedback_task(self):
+        gn_date = self.date
+        fback_datetime = datetime(gn_date.year, gn_date.month, gn_date.day+1, 12)
+        subject = 'Your Feedback is Requested!'
+        message = f"Thank you so much for attending my GameKnight on {str(gn_date)}! Please follow the link below to complete a short feedback survey: https://game-knight.netlify.app/game_night/{self.rid}/feedback"
+        email_list = []
+        for contact in self.attendees.all():
+            email_list.append(contact.email)
+        task = feedback_email.apply_async(
+            kwargs={
+                'subject': subject,
+                'message': message,
+                'email_list': email_list
+            },
+            eta=fback_datetime
+        )
+        self.feedback_task = task.id
+        self.save()
+
+    def update_feedback_task(self):
+        if self.feedback_task is not None:
+            result = AsyncResult(id=self.feedback_task)
+            result.revoke()
+        if self.status == 'Finalized':
+            self.schedule_feedback_task()
 
 
 class Tag(models.Model):

@@ -7,10 +7,12 @@ from .models import Game, GameNight, Tag, Category, Contact, Voting, GeneralFeed
 from .serializers import GameListSerializer, GameNightSerializer, GameDetailSerializer, TagListSerializer, ContactSerializer, VotingSerializer, GameNightCreateSerializer, GeneralFeedbackSerializer, GameFeedbackSerializer, RSVPSerializer
 from .permissions import IsAuthorOrReadOnly
 import requests, json, xmltodict, decimal, string, random
-from datetime import date
+from datetime import date, datetime, timedelta
 from rest_framework import status
 from rest_framework.response import Response
-
+from .tasks import test_email
+from celery.app.control import Control
+from celery.result import AsyncResult
 from api import serializers
 
 
@@ -167,6 +169,8 @@ class GameNightView(ListCreateAPIView):
     def perform_create(self, serializer):
         rand_id = self.get_rid()
         serializer.save(user=self.request.user, rid=rand_id)
+        gamenight = GameNight.objects.get(rid=rand_id)
+        gamenight.mail_gamenight_create()
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -205,6 +209,7 @@ class GameNightDetailView(RetrieveUpdateAPIView):
     #     queryset = user.gamenights.all()
     #     return queryset
 
+
     def get_object(self):
         '''
         overridden to grab GameNight object based on rid in the URL
@@ -218,6 +223,7 @@ class GameNightDetailView(RetrieveUpdateAPIView):
     def perform_update(self, serializer):
         gamenight = self.get_object()
         data = self.request.data
+
         if 'attendees' in data:
             contacts = data['attendees']
             for contact in contacts:
@@ -242,7 +248,19 @@ class GameNightDetailView(RetrieveUpdateAPIView):
                 pk = game['pk']
                 gamenight.update_games(pk)
                 gamenight.save()
+
         serializer.save()
+
+        updated_gamenight = self.get_object()
+        if 'status' in data:
+            gn_status = gamenight.status
+            if data['status'] == 'Finalized' or gn_status == 'Finalized':
+                if data['status'] != gn_status:
+                    updated_gamenight.update_feedback_task()
+        if 'date' in data:
+            if data['date'] != str(gamenight.date):
+                updated_gamenight.update_feedback_task()
+
 
 
 class ContactListView(ListCreateAPIView):
@@ -310,8 +328,10 @@ class GeneralFeedbackView(CreateAPIView):
         attendee_pk = self.request.data['attendee']
         contact = Contact.objects.get(pk=attendee_pk)
         gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
+
         if not GeneralFeedback.objects.filter(gamenight=gamenight, attendee=contact).exists():
             serializer.save(gamenight=gamenight, attendee=contact)
+
             return True
         return False
 
@@ -320,6 +340,7 @@ class GeneralFeedbackView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         saved = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+
         if saved:
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         not_saved = {'detail': 'Attendee has already left feedback.'}
@@ -372,9 +393,6 @@ class GameFeedbackView(CreateAPIView):
         return Response(not_saved, status=status.HTTP_418_IM_A_TEAPOT, headers=headers)
 
 
-    
-
-
 class RSVPListCreateView(ListCreateAPIView):
     serializer_class = RSVPSerializer
 
@@ -394,7 +412,7 @@ class RSVPListCreateView(ListCreateAPIView):
         gamenight = GameNight.objects.get(rid=self.kwargs['rid'])
         if not RSVP.objects.filter(gamenight=gamenight, invitee=contact).exists():
             serializer.save(gamenight=gamenight, invitee=contact)
-            if self.request.data['attending']:
+            if self.request.data['attending'] == 'True':
                 gamenight.update_attendees(contact.pk)
             return True
         return False
@@ -408,5 +426,4 @@ class RSVPListCreateView(ListCreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         not_saved = {'detail': 'Invitee has already RSVPed.'}
         return Response(not_saved, status=status.HTTP_418_IM_A_TEAPOT, headers=headers)
-
 
